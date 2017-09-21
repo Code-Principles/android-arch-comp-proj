@@ -1,9 +1,4 @@
-package com.codeprinciples.architecturecomponentsproject.models;
-
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
-
-import com.google.gson.annotations.SerializedName;
+package com.codeprinciples.architecturecomponentsproject.api;
 
 /**
  * MIT License
@@ -28,11 +23,8 @@ import com.google.gson.annotations.SerializedName;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@Entity
-public class Genre {
-    @SerializedName("id")
-    @PrimaryKey
-    public int id;
-    @SerializedName("name")
-    public String name;
+
+public interface Callback<T> {
+    void onSuccess(T obj);
+    void onFailure(int code,String msg);
 }

@@ -1,8 +1,9 @@
 package com.codeprinciples.architecturecomponentsproject.models;
 
-import com.google.gson.annotations.SerializedName;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * MIT License
@@ -27,11 +28,12 @@ import java.util.List;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-
+@Entity
 public class MovieSuggestion {
     @SerializedName("vote_count")
     public int voteCount;
     @SerializedName("id")
+    @PrimaryKey
     public int id;
     @SerializedName("video")
     public boolean video;
@@ -47,8 +49,8 @@ public class MovieSuggestion {
     public String originalLanguage;
     @SerializedName("original_title")
     public String originalTitle;
-    @SerializedName("genre_ids")
-    public List<Integer> genreIds = null;
+//    @SerializedName("genre_ids")
+//    public List<Integer> genreIds = null;
     @SerializedName("backdrop_path")
     public String backdropPath;
     @SerializedName("adult")
@@ -70,7 +72,7 @@ public class MovieSuggestion {
                 ", posterPath='" + posterPath + '\'' +
                 ", originalLanguage='" + originalLanguage + '\'' +
                 ", originalTitle='" + originalTitle + '\'' +
-                ", genreIds=" + genreIds +
+//                ", genreIds=" + genreIds +
                 ", backdropPath='" + backdropPath + '\'' +
                 ", adult=" + adult +
                 ", overview='" + overview + '\'' +

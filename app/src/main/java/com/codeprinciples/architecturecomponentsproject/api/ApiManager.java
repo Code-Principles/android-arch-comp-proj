@@ -1,20 +1,20 @@
 package com.codeprinciples.architecturecomponentsproject.api;
 
-import android.util.Log;
-
 import com.codeprinciples.architecturecomponentsproject.BuildConfig;
 import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
+import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
-import retrofit2.Callback;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 
@@ -52,6 +52,9 @@ public class ApiManager {
     }
 
     private ApiManager() {
+        HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
+// set your desired log level
+        logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(new Interceptor() {
             @Override
             public Response intercept(Interceptor.Chain chain) throws IOException {
@@ -60,7 +63,10 @@ public class ApiManager {
                 request = request.newBuilder().url(url).build();
                 return chain.proceed(request);
             }
-        }).build();
+        })
+                .addNetworkInterceptor(new StethoInterceptor())
+                .addInterceptor(logging)
+                .build();
 
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -72,35 +78,36 @@ public class ApiManager {
                 retrofit.create(MovieApiEndoitInterfcae.class);
     }
 
-    public void getMovieSuggestions(){
-        Call<DiscoverMoviesRequest> call = apiService.getMovieSuggestions();
-        call.enqueue(new Callback<DiscoverMoviesRequest>() {
-            @Override
-            public void onResponse(Call<DiscoverMoviesRequest> call, retrofit2.Response<DiscoverMoviesRequest> response) {
-                int statusCode = response.code();
-                Log.i(TAG, response.body().toString());
-            }
-
-            @Override
-            public void onFailure(Call<DiscoverMoviesRequest> call, Throwable t) {
-                Log.w(TAG, t.getMessage());
-            }
-        });
+    public void getMovieSuggestions(com.codeprinciples.architecturecomponentsproject.api.Callback<DiscoverMoviesRequest> callback){
+        apiService.getMovieSuggestions()
+                .enqueue(new RetroCallback<>(callback));
     }
 
-    public void getMovie(int movieId){
-        Call<Movie> call = apiService.getMovie(movieId);
-        call.enqueue(new Callback<Movie>() {
-            @Override
-            public void onResponse(Call<Movie> call, retrofit2.Response<Movie> response) {
-                int statusCode = response.code();
-                Log.i(TAG, response.body().toString());
-            }
+    public void getMovie(int movieId, Callback<Movie> callback){
+        apiService.getMovie(movieId)
+                .enqueue(new RetroCallback<>(callback));
+    }
 
-            @Override
-            public void onFailure(Call<Movie> call, Throwable t) {
-                Log.w(TAG, t.getMessage());
+    private class RetroCallback<T> implements retrofit2.Callback<T>{
+        private WeakReference<Callback<T>> callbackWeakReference;
+        private int statusCode;
+        public RetroCallback(Callback<T> callback) {
+            this.callbackWeakReference = new WeakReference<>(callback);
+        }
+
+        @Override
+        public void onResponse(Call<T> call, retrofit2.Response<T> response) {
+            statusCode = response.code();
+            if(callbackWeakReference.get()!=null){
+                callbackWeakReference.get().onSuccess(response.body());
             }
-        });
+        }
+
+        @Override
+        public void onFailure(Call<T> call, Throwable t) {
+            if(callbackWeakReference.get()!=null){
+                callbackWeakReference.get().onFailure(statusCode,t.getMessage());
+            }
+        }
     }
 }

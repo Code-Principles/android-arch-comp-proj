@@ -1,8 +1,10 @@
 package com.codeprinciples.architecturecomponentsproject.models;
 
-import com.google.gson.annotations.SerializedName;
+import android.arch.persistence.room.ColumnInfo;
+import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.PrimaryKey;
 
-import java.util.List;
+import com.google.gson.annotations.SerializedName;
 
 /**
  * MIT License
@@ -28,27 +30,24 @@ import java.util.List;
  * SOFTWARE.
  */
 
+    @Entity
 public class Movie {
-    @SerializedName("adult")
-    public boolean adult;
+    @SerializedName("id")
+    @PrimaryKey
+    public int id;
+    @SerializedName("title")
+    @ColumnInfo(name = "title")
+    public String title;
     @SerializedName("backdrop_path")
     public String backdropPath;
-    @SerializedName("belongs_to_collection")
-    public Object belongsToCollection;
-    @SerializedName("budget")
-    public int budget;
-    @SerializedName("genres")
-    public List<Genre> genres = null;
+//    @SerializedName("genres")
+//    public List<Genre> genres = null;
     @SerializedName("homepage")
     public String homepage;
-    @SerializedName("id")
-    public int id;
     @SerializedName("imdb_id")
     public String imdbId;
     @SerializedName("original_language")
     public String originalLanguage;
-    @SerializedName("original_title")
-    public String originalTitle;
     @SerializedName("overview")
     public String overview;
     @SerializedName("popularity")
@@ -63,12 +62,6 @@ public class Movie {
     public int runtime;
     @SerializedName("status")
     public String status;
-    @SerializedName("tagline")
-    public String tagline;
-    @SerializedName("title")
-    public String title;
-    @SerializedName("video")
-    public boolean video;
     @SerializedName("vote_average")
     public float voteAverage;
     @SerializedName("vote_count")
@@ -77,16 +70,12 @@ public class Movie {
     @Override
     public String toString() {
         return "Movie{" +
-                "adult=" + adult +
-                ", backdropPath='" + backdropPath + '\'' +
-                ", belongsToCollection=" + belongsToCollection +
-                ", budget=" + budget +
-                ", genres=" + genres +
+                "  backdropPath='" + backdropPath + '\'' +
+//                ", genres=" + genres +
                 ", homepage='" + homepage + '\'' +
                 ", id=" + id +
                 ", imdbId='" + imdbId + '\'' +
                 ", originalLanguage='" + originalLanguage + '\'' +
-                ", originalTitle='" + originalTitle + '\'' +
                 ", overview='" + overview + '\'' +
                 ", popularity=" + popularity +
                 ", posterPath='" + posterPath + '\'' +
@@ -94,9 +83,7 @@ public class Movie {
                 ", revenue=" + revenue +
                 ", runtime=" + runtime +
                 ", status='" + status + '\'' +
-                ", tagline='" + tagline + '\'' +
                 ", title='" + title + '\'' +
-                ", video=" + video +
                 ", voteAverage=" + voteAverage +
                 ", voteCount=" + voteCount +
                 '}';

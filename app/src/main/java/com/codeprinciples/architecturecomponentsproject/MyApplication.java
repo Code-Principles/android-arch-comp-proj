@@ -1,9 +1,9 @@
 package com.codeprinciples.architecturecomponentsproject;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import android.app.Application;
+import android.content.Context;
 
-import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
+import com.facebook.stetho.Stetho;
 
 /**
  * MIT License
@@ -28,12 +28,16 @@ import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class HomeActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        ApiManager.getInstance().getMovieSuggestions();
+public class MyApplication extends Application {
+    private static Context applicationContext;
+    public void onCreate() {
+        super.onCreate();
+        Stetho.initializeWithDefaults(this);
+        applicationContext = this;
+    }
+
+    public static Context getAppContext() {
+        return applicationContext;
     }
 }

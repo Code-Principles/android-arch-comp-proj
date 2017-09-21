@@ -1,9 +1,14 @@
-package com.codeprinciples.architecturecomponentsproject.models;
+package com.codeprinciples.architecturecomponentsproject.database;
 
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
 
-import com.google.gson.annotations.SerializedName;
+import com.codeprinciples.architecturecomponentsproject.models.Movie;
+
+import java.util.List;
 
 /**
  * MIT License
@@ -28,11 +33,12 @@ import com.google.gson.annotations.SerializedName;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-@Entity
-public class Genre {
-    @SerializedName("id")
-    @PrimaryKey
-    public int id;
-    @SerializedName("name")
-    public String name;
+@Dao
+public interface MovieDao {
+    @Query("SELECT * FROM movie")
+    List<Movie> getAll();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(Movie... movies);
+    @Delete
+    void delete(Movie movie);
 }
