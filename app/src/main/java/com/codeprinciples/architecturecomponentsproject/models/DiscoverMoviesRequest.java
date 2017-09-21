@@ -1,9 +1,8 @@
-package com.codeprinciples.architecturecomponentsproject;
+package com.codeprinciples.architecturecomponentsproject.models;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import com.google.gson.annotations.SerializedName;
 
-import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
+import java.util.List;
 
 /**
  * MIT License
@@ -28,12 +27,24 @@ import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class HomeActivity extends AppCompatActivity {
+
+public class DiscoverMoviesRequest {
+    @SerializedName("page")
+    public int page;
+    @SerializedName("total_results")
+    public int totalResults;
+    @SerializedName("total_pages")
+    public int totalPages;
+    @SerializedName("results")
+    public List<MovieSuggestion> results = null;
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        ApiManager.getInstance().getMovieSuggestions();
+    public String toString() {
+        return "DiscoverMoviesRequest{" +
+                "page=" + page +
+                ", totalResults=" + totalResults +
+                ", totalPages=" + totalPages +
+                ", results=" + results +
+                '}';
     }
 }

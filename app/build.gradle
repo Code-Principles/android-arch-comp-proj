@@ -10,6 +10,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "BASE_URL", "\"https://api.themoviedb.org/3/\""
+        buildConfigField "String", "API_KEY", "\"e2de634452ee014dbc85eeff83b40065\"" //replace with your own key that you can get from www.themoviedb.org
     }
     buildTypes {
         release {
@@ -27,6 +29,11 @@ dependencies {
     compile 'com.android.support:appcompat-v7:26.1.0'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     testCompile 'junit:junit:4.12'
+    //networking
+    compile 'com.google.code.gson:gson:2.7'
+    compile 'com.squareup.retrofit2:retrofit:2.1.0'
+    compile 'com.squareup.retrofit2:converter-gson:2.1.0'
+    //persistence
     compile 'android.arch.persistence.room:runtime:1.0.0-alpha9-1'
     annotationProcessor  'android.arch.persistence.room:compiler:1.0.0-alpha9-1'
     compile 'android.arch.paging:runtime:1.0.0-alpha1'

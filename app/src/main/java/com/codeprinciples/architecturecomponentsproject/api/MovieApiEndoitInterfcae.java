@@ -1,9 +1,11 @@
-package com.codeprinciples.architecturecomponentsproject;
+package com.codeprinciples.architecturecomponentsproject.api;
 
-import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
+import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
+import com.codeprinciples.architecturecomponentsproject.models.Movie;
 
-import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
+import retrofit2.Call;
+import retrofit2.http.GET;
+import retrofit2.http.Query;
 
 /**
  * MIT License
@@ -28,12 +30,11 @@ import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class HomeActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_home);
-        ApiManager.getInstance().getMovieSuggestions();
-    }
+public interface MovieApiEndoitInterfcae {
+    @GET("discover/movie")
+    Call<DiscoverMoviesRequest> getMovieSuggestions();
+    @GET("movie/{movie_id}")
+    Call<Movie> getMovie(@Query("movie_id")int movieId);
+
 }
