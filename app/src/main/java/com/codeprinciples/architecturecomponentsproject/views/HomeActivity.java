@@ -7,6 +7,7 @@ import android.util.Log;
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
+import com.codeprinciples.architecturecomponentsproject.models.Movie;
 
 /**
  * MIT License
@@ -49,8 +50,15 @@ public class HomeActivity extends AppCompatActivity {
     private void loadMovieDetails(int id) {
         ApiManager.getInstance().getMovie(id,
                 obj -> AppDatabase.executeAsync(
-                    () -> AppDatabase.getInstance().movieDao().insertAll(obj),
+                    () -> {
+                        AppDatabase.getInstance().movieDao().insertAll(obj);
+                        updateUI(obj);
+                    },
                     () -> Log.i(TAG,"Finished writing to database.")),
                 (code, msg) -> Log.e(TAG, "Failed loading movie details: " + msg));
+    }
+
+    private void updateUI(Movie obj) {
+        //todo
     }
 }
