@@ -52,19 +52,37 @@ public abstract class AppDatabase extends RoomDatabase{
         }
         return instance;
     }
-    public static void executeAsync(final Runnable action, final Runnable completion){
-        new AsyncTask<Void, Void, Void>() {
-            @Override
-            protected Void doInBackground(Void... params) {
-                action.run();
-                return null;
-            }
+    public static void executeAsync(Runnable action, Runnable completion){
+        AppDatabaseTask databaseTask = new AppDatabaseTask();
+        databaseTask.setAction(action);
+        databaseTask.setCompletion(completion);
+        databaseTask.execute();
+    }
+    public static  void executeAsync(Runnable action){
+        executeAsync(action,null);
+    }
+    private static class AppDatabaseTask extends AsyncTask<Void,Void,Void>{
+        private Runnable action, completion;
 
-            @Override
-            protected void onPostExecute(Void aVoid) {
+        private void setAction(Runnable action) {
+            this.action = action;
+        }
+
+        private void setCompletion(Runnable completion) {
+            this.completion = completion;
+        }
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            action.run();
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            if(completion!=null)
                 completion.run();
-                super.onPostExecute(aVoid);
-            }
-        }.execute();
+            super.onPostExecute(aVoid);
+        }
     }
 }

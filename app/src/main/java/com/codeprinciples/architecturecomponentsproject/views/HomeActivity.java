@@ -2,13 +2,11 @@ package com.codeprinciples.architecturecomponentsproject.views;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
-import com.codeprinciples.architecturecomponentsproject.api.Callback;
 import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
-import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
-import com.codeprinciples.architecturecomponentsproject.models.Movie;
 
 /**
  * MIT License
@@ -34,44 +32,25 @@ import com.codeprinciples.architecturecomponentsproject.models.Movie;
  * SOFTWARE.
  */
 public class HomeActivity extends AppCompatActivity {
-
+    private static final String TAG = "HomeActivity";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
-        //tests
-        ApiManager.getInstance().getMovieSuggestions(new Callback<DiscoverMoviesRequest>() {
-            @Override
-            public void onSuccess(DiscoverMoviesRequest obj) {
-                ApiManager.getInstance().getMovie(obj.results.get(0).id, new Callback<Movie>() {
-                    @Override
-                    public void onSuccess(final Movie obj) {
-                        AppDatabase.executeAsync(new Runnable() {
-                            @Override
-                            public void run() {
-                                AppDatabase.getInstance().movieDao().insertAll(obj);
-                            }
-                        }, new Runnable() {
-                            @Override
-                            public void run() {
+        loadSuggestions();
+    }
 
-                            }
-                        });
+    private void loadSuggestions() {
+        ApiManager.getInstance().getMovieSuggestions(
+                (obj) -> loadMovieDetails(obj.results.get(0).id),
+                ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
+    }
 
-                    }
-
-                    @Override
-                    public void onFailure(int code, String msg) {
-
-                    }
-                });
-            }
-
-            @Override
-            public void onFailure(int code, String msg) {
-
-            }
-        });
-        AppDatabase.getInstance().movieDao();
+    private void loadMovieDetails(int id) {
+        ApiManager.getInstance().getMovie(id,
+                obj -> AppDatabase.executeAsync(
+                    () -> AppDatabase.getInstance().movieDao().insertAll(obj),
+                    () -> Log.i(TAG,"Finished writing to database.")),
+                (code, msg) -> Log.e(TAG, "Failed loading movie details: " + msg));
     }
 }

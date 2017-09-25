@@ -78,35 +78,38 @@ public class ApiManager {
                 retrofit.create(MovieApiEndoitInterfcae.class);
     }
 
-    public void getMovieSuggestions(com.codeprinciples.architecturecomponentsproject.api.Callback<DiscoverMoviesRequest> callback){
+    public void getMovieSuggestions(CallbackSuccess<DiscoverMoviesRequest> success, CallbackFailure failure){
         apiService.getMovieSuggestions()
-                .enqueue(new RetroCallback<>(callback));
+                .enqueue(new RetroLambdaCallback<>(success,failure));
     }
 
-    public void getMovie(int movieId, Callback<Movie> callback){
+    public void getMovie(int movieId, CallbackSuccess<Movie> success, CallbackFailure failure){
         apiService.getMovie(movieId)
-                .enqueue(new RetroCallback<>(callback));
+                .enqueue(new RetroLambdaCallback<>(success,failure));
     }
 
-    private class RetroCallback<T> implements retrofit2.Callback<T>{
-        private WeakReference<Callback<T>> callbackWeakReference;
+    private class RetroLambdaCallback<T> implements retrofit2.Callback<T>{
+        private WeakReference<CallbackSuccess<T>> callbackSuccessWeakReference;
+        private WeakReference<CallbackFailure> callbackFailureWeakReference;
         private int statusCode;
-        public RetroCallback(Callback<T> callback) {
-            this.callbackWeakReference = new WeakReference<>(callback);
+
+        public RetroLambdaCallback(CallbackSuccess<T> success, CallbackFailure failure) {
+            this.callbackSuccessWeakReference = new WeakReference<>(success);
+            this.callbackFailureWeakReference = new WeakReference<>(failure);
         }
 
         @Override
         public void onResponse(Call<T> call, retrofit2.Response<T> response) {
             statusCode = response.code();
-            if(callbackWeakReference.get()!=null){
-                callbackWeakReference.get().onSuccess(response.body());
+            if(callbackSuccessWeakReference.get()!=null){
+                callbackSuccessWeakReference.get().onSuccess(response.body());
             }
         }
 
         @Override
         public void onFailure(Call<T> call, Throwable t) {
-            if(callbackWeakReference.get()!=null){
-                callbackWeakReference.get().onFailure(statusCode,t.getMessage());
+            if(callbackFailureWeakReference.get()!=null){
+                callbackFailureWeakReference.get().onFailure(statusCode,t.getMessage());
             }
         }
     }
