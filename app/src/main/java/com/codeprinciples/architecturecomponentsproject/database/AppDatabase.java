@@ -3,7 +3,6 @@ package com.codeprinciples.architecturecomponentsproject.database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
-import android.os.AsyncTask;
 import android.util.Log;
 
 import com.codeprinciples.architecturecomponentsproject.MyApplication;
@@ -61,28 +60,5 @@ public abstract class AppDatabase extends RoomDatabase{
     public static  void executeAsync(Runnable action){
         executeAsync(action,null);
     }
-    private static class AppDatabaseTask extends AsyncTask<Void,Void,Void>{
-        private Runnable action, completion;
 
-        private void setAction(Runnable action) {
-            this.action = action;
-        }
-
-        private void setCompletion(Runnable completion) {
-            this.completion = completion;
-        }
-
-        @Override
-        protected Void doInBackground(Void... params) {
-            action.run();
-            return null;
-        }
-
-        @Override
-        protected void onPostExecute(Void aVoid) {
-            if(completion!=null)
-                completion.run();
-            super.onPostExecute(aVoid);
-        }
-    }
 }
