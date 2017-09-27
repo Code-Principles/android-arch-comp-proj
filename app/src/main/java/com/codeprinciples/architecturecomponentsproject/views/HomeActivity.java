@@ -1,5 +1,6 @@
 package com.codeprinciples.architecturecomponentsproject.views;
 
+import android.arch.lifecycle.ViewModelProviders;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -8,8 +9,8 @@ import android.widget.TextView;
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
-import com.codeprinciples.architecturecomponentsproject.livedata.TimerLiveData;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
+import com.codeprinciples.architecturecomponentsproject.viewmodels.TimerViewModel;
 
 /**
  * MIT License
@@ -43,11 +44,11 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         textView = findViewById(R.id.textView);
         //observe LiveData directly
-        TimerLiveData  timerLiveData = new TimerLiveData();
-        timerLiveData.observe(this, integer -> textView.setText("Counter Time: " + integer + "s"));
+//        TimerLiveData  timerLiveData = new TimerLiveData();
+//        timerLiveData.observe(this, integer -> textView.setText("Counter Time: " + integer + "s"));
         //observe ViewModel's LiveData field
-//        TimerViewModel timerViewModel = ViewModelProviders.of(this).get(TimerViewModel.class);
-//        timerViewModel.getTimer().observe(this, integer -> textView.setText("Counter Time: " + integer + "s"));
+        TimerViewModel timerViewModel = ViewModelProviders.of(this).get(TimerViewModel.class);
+        timerViewModel.getTimer().observe(this, integer -> textView.setText("Counter Time: " + integer + "s"));
         loadSuggestions();
     }
 
