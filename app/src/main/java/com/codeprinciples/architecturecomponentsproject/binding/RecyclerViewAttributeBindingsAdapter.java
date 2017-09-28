@@ -1,13 +1,8 @@
-package com.codeprinciples.architecturecomponentsproject.views;
+package com.codeprinciples.architecturecomponentsproject.binding;
 
-import android.arch.lifecycle.ViewModelProviders;
-import android.databinding.DataBindingUtil;
-import android.os.Bundle;
-import android.support.v7.app.AppCompatActivity;
-
-import com.codeprinciples.architecturecomponentsproject.R;
-import com.codeprinciples.architecturecomponentsproject.databinding.ActivityHomeBinding;
-import com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel;
+import android.databinding.BindingAdapter;
+import android.databinding.ObservableList;
+import android.support.v7.widget.RecyclerView;
 
 /**
  * MIT License
@@ -32,16 +27,13 @@ import com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
  * SOFTWARE.
  */
-public class HomeActivity extends AppCompatActivity {
-    private static final String TAG = "HomeActivity";
-    private ActivityHomeBinding binding;
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        binding.setHomeViewModel(homeViewModel);
-        homeViewModel.getSuggestionsObservableList();
-        homeViewModel.loadSuggestions();
+
+public class RecyclerViewAttributeBindingsAdapter {
+    @BindingAdapter({"bind:list", "bind:layoutManager"})
+    public static void setList(RecyclerView rv, ObservableList dataItems, RecyclerView.LayoutManager layoutManager) {
+        if (rv.getLayoutManager() == null)
+            rv.setLayoutManager(layoutManager);
+        if (rv.getAdapter() == null)
+            rv.setAdapter(new RecyclerViewBindingAdapter(dataItems));
     }
 }
