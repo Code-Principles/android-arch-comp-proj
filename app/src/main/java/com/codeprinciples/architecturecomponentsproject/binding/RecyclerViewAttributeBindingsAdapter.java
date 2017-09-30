@@ -29,7 +29,7 @@ import android.support.v7.widget.RecyclerView;
  */
 
 public class RecyclerViewAttributeBindingsAdapter {
-    @BindingAdapter({"bind:list", "bind:layoutManager"})
+    @BindingAdapter({"android:list", "android:layoutManager"})
     public static void setList(RecyclerView rv, ObservableList dataItems, RecyclerView.LayoutManager layoutManager) {
         if (rv.getLayoutManager() == null)
             rv.setLayoutManager(layoutManager);

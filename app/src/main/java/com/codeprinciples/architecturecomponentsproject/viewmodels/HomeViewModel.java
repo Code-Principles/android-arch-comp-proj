@@ -1,5 +1,6 @@
 package com.codeprinciples.architecturecomponentsproject.viewmodels;
 
+import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.databinding.ObservableArrayList;
@@ -46,7 +47,19 @@ import java.util.List;
 public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
-    private RecyclerView.LayoutManager layoutManager;
+    private MutableLiveData<MovieSuggestion> currentMovie;
+    private OnSuggestionClicked onSuggestedMovieClickListener;
+
+    public MutableLiveData<MovieSuggestion> getCurrentMovie() {
+        if(currentMovie==null){
+            currentMovie = new MutableLiveData<>();
+        }
+        return currentMovie;
+    }
+
+    public void setCurrentMovie(MovieSuggestion currentMovie) {
+        getCurrentMovie().setValue(currentMovie);
+    }
 
     public ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> getSuggestionsObservableList() {
         if(discoverItems==null){
@@ -56,10 +69,7 @@ public class HomeViewModel extends ViewModel {
     }
 
     public RecyclerView.LayoutManager getLayoutManager(Context context){
-        if(layoutManager==null){
-            layoutManager = new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false);
-        }
-        return layoutManager;
+        return new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false);
     }
     public void loadSuggestions() {
         ApiManager.getInstance().getMovieSuggestions(
@@ -82,6 +92,12 @@ public class HomeViewModel extends ViewModel {
         //todo
     }
 
+    public void onSuggestionClick(MovieSuggestion movieSuggestion){
+        setCurrentMovie(movieSuggestion);
+        if(onSuggestedMovieClickListener!=null)
+            onSuggestedMovieClickListener.onClick();
+    }
+
     private List<RecyclerViewBindingAdapter.AdapterDataItem> convert(List<MovieSuggestion> suggestions) {
         List<RecyclerViewBindingAdapter.AdapterDataItem> items = new ArrayList<>();
         for (MovieSuggestion item : suggestions) {
@@ -95,5 +111,13 @@ public class HomeViewModel extends ViewModel {
                 R.layout.layout_discover_movie,
                 new Pair<>( BR.homeViewModel, this),
                 new Pair<>(BR.movieSuggestion,item));
+    }
+
+    public void setOnSuggestedMovieClickListener(OnSuggestionClicked onSuggestedMovieClickListener) {
+        this.onSuggestedMovieClickListener = onSuggestedMovieClickListener;
+    }
+
+    public interface OnSuggestionClicked{
+        void onClick();
     }
 }

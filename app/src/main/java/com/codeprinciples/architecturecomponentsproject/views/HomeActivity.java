@@ -3,6 +3,7 @@ package com.codeprinciples.architecturecomponentsproject.views;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
+import android.support.v4.app.FragmentManager;
 import android.support.v7.app.AppCompatActivity;
 
 import com.codeprinciples.architecturecomponentsproject.R;
@@ -40,8 +41,39 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        binding.setHomeViewModel(homeViewModel);
         homeViewModel.getSuggestionsObservableList();
         homeViewModel.loadSuggestions();
+        if(binding.detailFragment==null) {//phone or tablet portrait
+            homeViewModel.setOnSuggestedMovieClickListener(new HomeViewModel.OnSuggestionClicked() {
+                @Override
+                public void onClick() {
+                    getSupportFragmentManager().beginTransaction()
+                            .add(R.id.container, new DetailFragment())
+                            .addToBackStack(null)
+                            .commit();
+                }
+            });
+        }else{//tablet landscape
+            getSupportFragmentManager().beginTransaction()
+                    .add(R.id.detail_fragment,new DetailFragment())
+                    .commit();
+        }
+        setSuggestionListFragment();
+    }
+
+    private void setSuggestionListFragment() {
+        getSupportFragmentManager().beginTransaction()
+                .add(R.id.container,new SuggestionListFragment())
+                .commit();
+    }
+
+    @Override
+    public void onBackPressed(){
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStack();
+        } else {
+            super.onBackPressed();
+        }
     }
 }
