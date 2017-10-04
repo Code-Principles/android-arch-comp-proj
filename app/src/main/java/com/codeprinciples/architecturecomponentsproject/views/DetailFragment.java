@@ -67,9 +67,12 @@ public class DetailFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         //testing
         HomeViewModel homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
-        homeViewModel.getCurrentMovie().observe(this, movieSuggestion -> binding.detailText.setText("selected movieId: "+movieSuggestion.id));
-        if(homeViewModel.getCurrentMovie().getValue()!=null){
-            binding.detailText.setText("selected movieId: "+homeViewModel.getCurrentMovie().getValue().id);
-        }
+        homeViewModel.getCurrentMovie().observe(this, movieSuggestion -> {
+            if(movieSuggestion!=null){
+                binding.detailText.setText("selected movieId: "+movieSuggestion.id);
+            }else{
+                binding.detailText.setText("nothing selected");
+            }
+        });
     }
 }

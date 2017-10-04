@@ -48,7 +48,6 @@ public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
     private MutableLiveData<MovieSuggestion> currentMovie;
-    private OnSuggestionClicked onSuggestedMovieClickListener;
 
     public MutableLiveData<MovieSuggestion> getCurrentMovie() {
         if(currentMovie==null){
@@ -94,8 +93,6 @@ public class HomeViewModel extends ViewModel {
 
     public void onSuggestionClick(MovieSuggestion movieSuggestion){
         setCurrentMovie(movieSuggestion);
-        if(onSuggestedMovieClickListener!=null)
-            onSuggestedMovieClickListener.onClick();
     }
 
     private List<RecyclerViewBindingAdapter.AdapterDataItem> convert(List<MovieSuggestion> suggestions) {
@@ -111,10 +108,6 @@ public class HomeViewModel extends ViewModel {
                 R.layout.layout_discover_movie,
                 new Pair<>( BR.homeViewModel, this),
                 new Pair<>(BR.movieSuggestion,item));
-    }
-
-    public void setOnSuggestedMovieClickListener(OnSuggestionClicked onSuggestedMovieClickListener) {
-        this.onSuggestedMovieClickListener = onSuggestedMovieClickListener;
     }
 
     public interface OnSuggestionClicked{

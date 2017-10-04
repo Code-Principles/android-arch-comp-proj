@@ -3,11 +3,12 @@ package com.codeprinciples.architecturecomponentsproject.views;
 import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
-import android.support.v4.app.FragmentManager;
+import android.support.annotation.IdRes;
 import android.support.v7.app.AppCompatActivity;
 
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.databinding.ActivityHomeBinding;
+import com.codeprinciples.architecturecomponentsproject.other.Utils;
 import com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel;
 
 /**
@@ -36,42 +37,41 @@ import com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel
 public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     private ActivityHomeBinding binding;
+    private HomeViewModel homeViewModel;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         homeViewModel.getSuggestionsObservableList();
         homeViewModel.loadSuggestions();
+
+        setFragment(R.id.container, SuggestionListFragment.class);
+
         if(binding.detailFragment==null) {//phone or tablet portrait
-            homeViewModel.setOnSuggestedMovieClickListener(new HomeViewModel.OnSuggestionClicked() {
-                @Override
-                public void onClick() {
-                    getSupportFragmentManager().beginTransaction()
-                            .add(R.id.container, new DetailFragment())
-                            .addToBackStack(null)
-                            .commit();
-                }
+            homeViewModel.getCurrentMovie().observe(this, movieSuggestion ->{
+                if(movieSuggestion!=null)
+                    setFragment(R.id.container, DetailFragment.class);
+                else
+                    setFragment(R.id.container, SuggestionListFragment.class);
             });
         }else{//tablet landscape
-            getSupportFragmentManager().beginTransaction()
-                    .add(R.id.detail_fragment,new DetailFragment())
-                    .commit();
+            setFragment(R.id.detail_fragment, DetailFragment.class);
         }
-        setSuggestionListFragment();
     }
 
-    private void setSuggestionListFragment() {
-        getSupportFragmentManager().beginTransaction()
-                .add(R.id.container,new SuggestionListFragment())
-                .commit();
+    private void setFragment(@IdRes int id, Class<?> fragment){
+        Utils.setFragmentIfNotExists(getSupportFragmentManager(),
+                id,
+                fragment,
+                false);
     }
 
     @Override
     public void onBackPressed(){
-        FragmentManager fm = getSupportFragmentManager();
-        if (fm.getBackStackEntryCount() > 0) {
-            fm.popBackStack();
+        if (homeViewModel.getCurrentMovie().getValue()!=null) {
+            homeViewModel.setCurrentMovie(null);
         } else {
             super.onBackPressed();
         }
