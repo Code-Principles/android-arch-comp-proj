@@ -1,5 +1,6 @@
 package com.codeprinciples.architecturecomponentsproject.api;
 
+import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 
@@ -36,5 +37,6 @@ public interface MovieApiEndoitInterfcae {
     Call<DiscoverMoviesRequest> getMovieSuggestions();
     @GET("movie/{movie_id}")
     Call<Movie> getMovie(@Path("movie_id")int movieId);
-
+    @GET("configuration")
+    Call<Configuration> getConfiguration();
 }

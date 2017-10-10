@@ -1,6 +1,7 @@
 package com.codeprinciples.architecturecomponentsproject.api;
 
 import com.codeprinciples.architecturecomponentsproject.BuildConfig;
+import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
@@ -80,20 +81,25 @@ public class ApiManager {
 
     public void getMovieSuggestions(CallbackSuccess<DiscoverMoviesRequest> success, CallbackFailure failure){
         apiService.getMovieSuggestions()
-                .enqueue(new RetroLambdaCallback<>(success,failure));
+                .enqueue(new LambdaHolderCallback<>(success,failure));
     }
 
     public void getMovie(int movieId, CallbackSuccess<Movie> success, CallbackFailure failure){
         apiService.getMovie(movieId)
-                .enqueue(new RetroLambdaCallback<>(success,failure));
+                .enqueue(new LambdaHolderCallback<>(success,failure));
     }
 
-    private class RetroLambdaCallback<T> implements retrofit2.Callback<T>{
+    public void getConfiguration(CallbackSuccess<Configuration> success, CallbackFailure failure){
+        apiService.getConfiguration()
+                .enqueue(new LambdaHolderCallback<>(success,failure));
+    }
+
+    private class LambdaHolderCallback<T> implements retrofit2.Callback<T>{
         private WeakReference<CallbackSuccess<T>> callbackSuccessWeakReference;
         private WeakReference<CallbackFailure> callbackFailureWeakReference;
         private int statusCode;
 
-        public RetroLambdaCallback(CallbackSuccess<T> success, CallbackFailure failure) {
+        public LambdaHolderCallback(CallbackSuccess<T> success, CallbackFailure failure) {
             this.callbackSuccessWeakReference = new WeakReference<>(success);
             this.callbackFailureWeakReference = new WeakReference<>(failure);
         }
