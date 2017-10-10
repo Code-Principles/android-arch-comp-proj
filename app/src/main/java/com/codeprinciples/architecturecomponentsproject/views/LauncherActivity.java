@@ -34,7 +34,10 @@ public class LauncherActivity extends AppCompatActivity {
         launcherViewModel = ViewModelProviders.of(this).get(LauncherViewModel.class);
         launcherViewModel.getConfiguration().observe(this, configuration -> {
             if(configuration!=null)
-                binding.getRoot().postDelayed(() -> startActivity(new Intent(LauncherActivity.this,HomeActivity.class)),2000);
+                binding.getRoot().postDelayed(() -> {
+                    startActivity(new Intent(LauncherActivity.this,HomeActivity.class));
+                    finish();
+                },2000);
         });
     }
 }

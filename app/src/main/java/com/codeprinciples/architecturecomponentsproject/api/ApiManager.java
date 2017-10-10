@@ -7,7 +7,6 @@ import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.IOException;
-import java.lang.ref.WeakReference;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -95,27 +94,27 @@ public class ApiManager {
     }
 
     private class LambdaHolderCallback<T> implements retrofit2.Callback<T>{
-        private WeakReference<CallbackSuccess<T>> callbackSuccessWeakReference;
-        private WeakReference<CallbackFailure> callbackFailureWeakReference;
+        private CallbackSuccess<T> callbackSuccess;
+        private CallbackFailure callbackFailure;
         private int statusCode;
 
         public LambdaHolderCallback(CallbackSuccess<T> success, CallbackFailure failure) {
-            this.callbackSuccessWeakReference = new WeakReference<>(success);
-            this.callbackFailureWeakReference = new WeakReference<>(failure);
+            this.callbackSuccess = success;
+            this.callbackFailure = failure;
         }
 
         @Override
         public void onResponse(Call<T> call, retrofit2.Response<T> response) {
             statusCode = response.code();
-            if(callbackSuccessWeakReference.get()!=null){
-                callbackSuccessWeakReference.get().onSuccess(response.body());
+            if(callbackSuccess!=null){
+                callbackSuccess.onSuccess(response.body());
             }
         }
 
         @Override
         public void onFailure(Call<T> call, Throwable t) {
-            if(callbackFailureWeakReference.get()!=null){
-                callbackFailureWeakReference.get().onFailure(statusCode,t.getMessage());
+            if(callbackFailure!=null){
+                callbackFailure.onFailure(statusCode,t.getMessage());
             }
         }
     }
