@@ -15,26 +15,33 @@ package com.codeprinciples.architecturecomponentsproject.viewmodels;
 
 import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
+import android.databinding.ObservableField;
 
-import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.models.Configuration;
+import com.codeprinciples.architecturecomponentsproject.models.Resource;
+import com.codeprinciples.architecturecomponentsproject.repo.Repository;
 
 public class LauncherViewModel extends ViewModel {
-    MutableLiveData<Configuration> configuration;
+    private MutableLiveData<Resource<Configuration>> configuration;
+    private ObservableField<Resource.Error> error;
 
-    public MutableLiveData<Configuration> getConfiguration() {
-        if(configuration==null) {
+
+    public MutableLiveData<Resource<Configuration>> getConfiguration() {
+        setErrorState(null);
+        if(configuration==null)
             configuration = new MutableLiveData<>();
-            loadConfiguration();
-        }
+        if(configuration.getValue()==null || configuration.getValue().getData()==null)
+            Repository.getInstance().getConfig(configuration);
         return configuration;
     }
 
-    private void loadConfiguration() {
-        ApiManager.getInstance().getConfiguration(
-                obj -> configuration.setValue(obj),
-                (code, msg) -> configuration.setValue(null));
+    public ObservableField<Resource.Error> getError() {
+        if(error==null)
+            error = new ObservableField<>();
+        return error;
     }
 
-
+    public void setErrorState(Resource.Error err){
+        getError().set(err);
+    }
 }

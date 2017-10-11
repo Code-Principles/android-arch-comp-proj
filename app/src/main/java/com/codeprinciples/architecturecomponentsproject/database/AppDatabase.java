@@ -6,6 +6,7 @@ import android.arch.persistence.room.RoomDatabase;
 import android.util.Log;
 
 import com.codeprinciples.architecturecomponentsproject.MyApplication;
+import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.codeprinciples.architecturecomponentsproject.models.Genre;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
@@ -34,11 +35,12 @@ import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
  * SOFTWARE.
  */
 
-@Database(entities = {Movie.class,  MovieSuggestion.class, Genre.class}, version = 1)
+@Database(entities = {Movie.class,  MovieSuggestion.class, Genre.class, Configuration.class,}, version = 2)
 public abstract class AppDatabase extends RoomDatabase{
     private static final String TAG = "AppDatabase";
     private static  AppDatabase instance;
     public abstract MovieDao movieDao();
+    public abstract ConfigurationDao configurationDao();
 //    public abstract GenreDao genreDao();
 //    public abstract MovieSuggestionDao movieSuggestionDao();
     public AppDatabase(){
@@ -47,7 +49,8 @@ public abstract class AppDatabase extends RoomDatabase{
     public static AppDatabase getInstance(){
         if(instance==null){
             instance = Room.databaseBuilder(MyApplication.getAppContext(),
-                    AppDatabase.class, "app-database").build();
+                    AppDatabase.class, "app-database")
+                    .fallbackToDestructiveMigration().build();
         }
         return instance;
     }

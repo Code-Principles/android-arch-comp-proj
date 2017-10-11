@@ -21,6 +21,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.databinding.ActivityLauncherBinding;
+import com.codeprinciples.architecturecomponentsproject.models.Resource;
 import com.codeprinciples.architecturecomponentsproject.viewmodels.LauncherViewModel;
 
 public class LauncherActivity extends AppCompatActivity {
@@ -30,14 +31,19 @@ public class LauncherActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_launcher);
         launcherViewModel = ViewModelProviders.of(this).get(LauncherViewModel.class);
-        launcherViewModel.getConfiguration().observe(this, configuration -> {
-            if(configuration!=null)
-                binding.getRoot().postDelayed(() -> {
-                    startActivity(new Intent(LauncherActivity.this,HomeActivity.class));
-                    finish();
-                },2000);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_launcher);
+        binding.setViewModel(launcherViewModel);
+        launcherViewModel.getConfiguration().observe(this, configurationResource -> {
+            if(configurationResource!=null&&configurationResource.getData()!=null) {
+                startActivity(new Intent(LauncherActivity.this, HomeActivity.class));
+                finish();
+            }else if(configurationResource!=null&&configurationResource.getError()!=null){
+                launcherViewModel.setErrorState(configurationResource.getError());
+            }else{
+                launcherViewModel.setErrorState(new Resource.Error(0,"Unknown Error. Please Try Again."));
+            }
+
         });
     }
 }

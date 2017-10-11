@@ -13,30 +13,42 @@
 
 package com.codeprinciples.architecturecomponentsproject.models;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+public class Resource<T> {
+    private Error error;
+    private T data;
 
-import com.codeprinciples.architecturecomponentsproject.database.CacheItem;
-import com.google.gson.annotations.SerializedName;
-@Entity
-public class Configuration implements CacheItem {
-    @PrimaryKey(autoGenerate = true)
-    public int id;
-    @SerializedName("images")
-    @Embedded
-    public Images images;
-
-    public long timeStamp = System.currentTimeMillis();
-
-
-    @Override
-    public boolean canUseCashed() {
-        return timeStamp+getCacheLifeTimeMilli()>System.currentTimeMillis();
+    public Resource(T data) {
+        this.data = data;
     }
 
-    @Override
-    public long getCacheLifeTimeMilli() {
-        return 60*60*1000;
+    public Resource(Error error) {
+        this.error = error;
+    }
+
+    public Error getError() {
+        return error;
+    }
+
+
+    public T getData() {
+        return data;
+    }
+
+    public static class Error{
+        private int code;
+        private String message;
+
+        public Error(int code, String message) {
+            this.code = code;
+            this.message = message;
+        }
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getMessage() {
+            return message;
+        }
     }
 }

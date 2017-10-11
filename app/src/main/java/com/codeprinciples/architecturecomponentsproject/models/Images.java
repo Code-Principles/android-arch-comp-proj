@@ -13,23 +13,13 @@
 
 package com.codeprinciples.architecturecomponentsproject.models;
 
+import android.arch.persistence.room.Entity;
+
 import com.google.gson.annotations.SerializedName;
-
-import java.util.List;
-
+@Entity
 public class Images {
     @SerializedName("base_url")
     public String baseUrl;
     @SerializedName("secure_base_url")
     public String secureBaseUrl;
-    @SerializedName("backdrop_sizes")
-    public List<String> backdropSizes = null;
-    @SerializedName("logo_sizes")
-    public List<String> logoSizes = null;
-    @SerializedName("poster_sizes")
-    public List<String> posterSizes = null;
-    @SerializedName("profile_sizes")
-    public List<String> profileSizes = null;
-    @SerializedName("still_sizes")
-    public List<String> stillSizes = null;
 }

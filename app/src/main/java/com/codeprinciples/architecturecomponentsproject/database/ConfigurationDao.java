@@ -11,32 +11,24 @@
  *
  */
 
-package com.codeprinciples.architecturecomponentsproject.models;
+package com.codeprinciples.architecturecomponentsproject.database;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import android.arch.persistence.room.Dao;
+import android.arch.persistence.room.Delete;
+import android.arch.persistence.room.Insert;
+import android.arch.persistence.room.OnConflictStrategy;
+import android.arch.persistence.room.Query;
 
-import com.codeprinciples.architecturecomponentsproject.database.CacheItem;
-import com.google.gson.annotations.SerializedName;
-@Entity
-public class Configuration implements CacheItem {
-    @PrimaryKey(autoGenerate = true)
-    public int id;
-    @SerializedName("images")
-    @Embedded
-    public Images images;
+import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 
-    public long timeStamp = System.currentTimeMillis();
+import java.util.List;
 
-
-    @Override
-    public boolean canUseCashed() {
-        return timeStamp+getCacheLifeTimeMilli()>System.currentTimeMillis();
-    }
-
-    @Override
-    public long getCacheLifeTimeMilli() {
-        return 60*60*1000;
-    }
+@Dao
+public interface  ConfigurationDao {
+    @Query("SELECT * FROM configuration")
+    List<Configuration> getAll();
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertAll(Configuration... configurations);
+    @Delete
+    void delete(Configuration... configuration);
 }
