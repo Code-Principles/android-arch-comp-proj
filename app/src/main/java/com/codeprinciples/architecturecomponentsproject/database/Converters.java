@@ -11,28 +11,27 @@
  *
  */
 
-package com.codeprinciples.architecturecomponentsproject.models;
+package com.codeprinciples.architecturecomponentsproject.database;
 
-import android.arch.persistence.room.Entity;
+import android.arch.persistence.room.TypeConverter;
 
-import com.google.gson.annotations.SerializedName;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
+import java.lang.reflect.Type;
 import java.util.List;
 
-@Entity
-public class Images {
-    @SerializedName("base_url")
-    public String baseUrl;
-    @SerializedName("secure_base_url")
-    public String secureBaseUrl;
-    @SerializedName("backdrop_sizes")
-    public List<String> backdropSizes = null;
-    @SerializedName("logo_sizes")
-    public List<String> logoSizes = null;
-    @SerializedName("poster_sizes")
-    public List<String> posterSizes = null;
-    @SerializedName("profile_sizes")
-    public List<String> profileSizes = null;
-    @SerializedName("still_sizes")
-    public List<String> stillSizes = null;
+public class Converters {
+    @TypeConverter
+    public static List<String> fromString(String value) {
+        Type listType = new TypeToken<List<String>>() {}.getType();
+        return new Gson().fromJson(value, listType);
+    }
+
+    @TypeConverter
+    public static String fromArrayList(List<String> list) {
+        Gson gson = new Gson();
+        String json = gson.toJson(list);
+        return json;
+    }
 }

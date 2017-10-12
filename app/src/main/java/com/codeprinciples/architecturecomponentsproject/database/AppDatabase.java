@@ -3,6 +3,7 @@ package com.codeprinciples.architecturecomponentsproject.database;
 import android.arch.persistence.room.Database;
 import android.arch.persistence.room.Room;
 import android.arch.persistence.room.RoomDatabase;
+import android.arch.persistence.room.TypeConverters;
 import android.util.Log;
 
 import com.codeprinciples.architecturecomponentsproject.MyApplication;
@@ -36,6 +37,7 @@ import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
  */
 
 @Database(entities = {Movie.class,  MovieSuggestion.class, Genre.class, Configuration.class,}, version = 2)
+@TypeConverters({Converters.class})
 public abstract class AppDatabase extends RoomDatabase{
     private static final String TAG = "AppDatabase";
     private static  AppDatabase instance;

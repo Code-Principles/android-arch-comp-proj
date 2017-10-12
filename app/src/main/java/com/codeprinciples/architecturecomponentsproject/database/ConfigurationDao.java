@@ -21,14 +21,12 @@ import android.arch.persistence.room.Query;
 
 import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 
-import java.util.List;
-
 @Dao
 public interface  ConfigurationDao {
-    @Query("SELECT * FROM configuration")
-    List<Configuration> getAll();
+    @Query("SELECT * FROM configuration LIMIT 1")
+    Configuration get();
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(Configuration... configurations);
+    void set(Configuration configuration);
     @Delete
-    void delete(Configuration... configuration);
+    void delete(Configuration configuration);
 }

@@ -17,7 +17,11 @@ import android.databinding.BindingAdapter;
 import android.graphics.drawable.Drawable;
 import android.widget.ImageView;
 
+import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
+import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.squareup.picasso.Picasso;
+
+import java.util.List;
 
 /**
  * MIT License
@@ -44,6 +48,39 @@ import com.squareup.picasso.Picasso;
  */
 
 public class ImageViewAttributeBindingsAdapter {
+    private static String POSTER_BASE_URL;
+    @BindingAdapter({"android:posterUrl", "android:error", "android:posterSize"})
+    public static void loadPosterImage(ImageView view, String url, Drawable error, ApiAssetSize posterSize) {
+        if(POSTER_BASE_URL==null)
+        {
+            AppDatabase.executeAsync(() -> {
+                Configuration config = AppDatabase.getInstance().configurationDao().get();
+                if(config!=null&&config.images!=null&&config.images.baseUrl!=null) {
+                    POSTER_BASE_URL = config.images.baseUrl + getSizeValue(config.images.posterSizes, posterSize);
+                }
+            }, () -> Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).into(view));
+        }else {
+            Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).into(view);
+        }
+    }
+
+    private static String getSizeValue(List<String> posterSizes, ApiAssetSize size) {
+        if(posterSizes!=null){
+            switch (size) {
+                case SMALL:
+                    posterSizes.get(0);
+                    break;
+                case MED:
+                    posterSizes.get(posterSizes.size()/2);
+                    break;
+                case LARGE:
+                    posterSizes.get(posterSizes.size()-1);
+                    break;
+            }
+        }
+        return "w500";
+    }
+
     @BindingAdapter({"android:srcUrl", "android:error"})
     public static void loadImage(ImageView view, String url, Drawable error) {
         Picasso.with(view.getContext()).load(url).error(error).into(view);

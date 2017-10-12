@@ -20,9 +20,6 @@ import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
 import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class Repository {
     private static final Repository ourInstance = new Repository();
 
@@ -33,16 +30,15 @@ public class Repository {
     private Repository() {
     }
     public void getConfig(MutableLiveData<Resource<Configuration>> configurationMutableLiveData){
-        final List<Configuration> configurationList = new ArrayList<>();
         AppDatabase.executeAsync(() -> {
-            configurationList.addAll(AppDatabase.getInstance().configurationDao().getAll());
-            if(configurationList.size()==0){
+            Configuration config= AppDatabase.getInstance().configurationDao().get();
+            if(config == null){
                 loadConfigFromNetwork(configurationMutableLiveData);
             }else{
-                if(configurationList.get(0).canUseCashed())
-                    configurationMutableLiveData.postValue(new Resource<>(configurationList.get(0)));
+                if(config.canUseCashed())
+                    configurationMutableLiveData.postValue(new Resource<>(config));
                 else {
-                    AppDatabase.getInstance().configurationDao().delete((Configuration[]) configurationList.toArray());
+                    AppDatabase.getInstance().configurationDao().delete(config);
                     loadConfigFromNetwork(configurationMutableLiveData);
                 }
             }
@@ -52,7 +48,7 @@ public class Repository {
 
     private void loadConfigFromNetwork(MutableLiveData<Resource<Configuration>> configurationMutableLiveData) {
         ApiManager.getInstance().getConfiguration(obj -> {
-            AppDatabase.executeAsync(() -> AppDatabase.getInstance().configurationDao().insertAll(obj));
+            AppDatabase.executeAsync(() -> AppDatabase.getInstance().configurationDao().set(obj));
             configurationMutableLiveData.setValue(new Resource<>(obj));
         }, (code, msg) -> configurationMutableLiveData.setValue(new Resource<>(new Resource.Error(code,msg))));
     }
