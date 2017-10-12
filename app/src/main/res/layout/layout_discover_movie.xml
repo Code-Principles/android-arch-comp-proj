@@ -1,31 +1,66 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout >
+<layout xmlns:tools="http://schemas.android.com/tools">
+
     <data>
-        <import type="com.codeprinciples.architecturecomponentsproject.binding.ApiAssetSize"/>
+
+        <import type="com.codeprinciples.architecturecomponentsproject.binding.ApiAssetSize" />
+
         <variable
             name="homeViewModel"
-            type="com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel"/>
+            type="com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel" />
+
         <variable
             name="movieSuggestion"
-            type="com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion"/>
+            type="com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion" />
     </data>
+
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_margin="4dp"
+        android:paddingBottom="4dp"
         android:onClick="@{()->homeViewModel.onSuggestionClick(movieSuggestion)}">
+
         <ImageView
             android:id="@+id/image"
-            android:layout_width="10dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
-            android:posterUrl="@{movieSuggestion.posterPath}"
             android:error="@{@drawable/ic_broken_image}"
-            android:posterSize="@{ApiAssetSize.MED}"/>
+            android:placeholder="@{@drawable/ic_image}"
+            android:posterSize="@{ApiAssetSize.MED}"
+            android:posterUrl="@{movieSuggestion.posterPath}"
+            tools:src="@drawable/ic_android" />
+
         <TextView
             android:id="@+id/movie_title"
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@+id/image"
-            android:text="@{movieSuggestion.title}"/>
+            android:maxLines="2"
+            android:minLines="2"
+            android:text="@{movieSuggestion.title}"
+            android:textSize="16sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/rating_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/movie_title"
+            android:layout_toLeftOf="@id/whatshot"
+            android:gravity="right"
+            android:maxLines="1"
+            android:text="@{String.valueOf(movieSuggestion.voteAverage)}" />
+
+        <ImageView
+            android:id="@+id/whatshot"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignBottom="@id/rating_text"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/rating_text"
+            android:adjustViewBounds="true"
+            android:src="@drawable/ic_whatshot" />
     </RelativeLayout>
 </layout>

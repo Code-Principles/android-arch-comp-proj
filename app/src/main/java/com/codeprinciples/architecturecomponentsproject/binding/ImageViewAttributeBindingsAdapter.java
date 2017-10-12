@@ -49,8 +49,8 @@ import java.util.List;
 
 public class ImageViewAttributeBindingsAdapter {
     private static String POSTER_BASE_URL;
-    @BindingAdapter({"android:posterUrl", "android:error", "android:posterSize"})
-    public static void loadPosterImage(ImageView view, String url, Drawable error, ApiAssetSize posterSize) {
+    @BindingAdapter({"android:posterUrl", "android:error","android:placeholder", "android:posterSize"})
+    public static void loadPosterImage(ImageView view, String url, Drawable error,Drawable placeHolder, ApiAssetSize posterSize) {
         if(POSTER_BASE_URL==null)
         {
             AppDatabase.executeAsync(() -> {
@@ -58,9 +58,9 @@ public class ImageViewAttributeBindingsAdapter {
                 if(config!=null&&config.images!=null&&config.images.baseUrl!=null) {
                     POSTER_BASE_URL = config.images.baseUrl + getSizeValue(config.images.posterSizes, posterSize);
                 }
-            }, () -> Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).into(view));
+            }, () -> Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).placeholder(placeHolder).into(view));
         }else {
-            Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).into(view);
+            Picasso.with(view.getContext()).load(POSTER_BASE_URL + url).error(error).placeholder(placeHolder).into(view);
         }
     }
 
@@ -81,8 +81,8 @@ public class ImageViewAttributeBindingsAdapter {
         return "w500";
     }
 
-    @BindingAdapter({"android:srcUrl", "android:error"})
-    public static void loadImage(ImageView view, String url, Drawable error) {
-        Picasso.with(view.getContext()).load(url).error(error).into(view);
+    @BindingAdapter({"android:srcUrl", "android:error","android:placeholder"})
+    public static void loadImage(ImageView view, String url,Drawable placeHolder, Drawable error) {
+        Picasso.with(view.getContext()).load(url).error(error).placeholder(placeHolder).into(view);
     }
 }

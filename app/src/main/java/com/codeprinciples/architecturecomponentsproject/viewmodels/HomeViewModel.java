@@ -4,6 +4,7 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.databinding.ObservableArrayList;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -48,6 +49,8 @@ public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
     private MutableLiveData<MovieSuggestion> currentMovie;
+    public enum ListLayoutType {LIST,GRID}
+    private ListLayoutType listLayoutType;
 
     public MutableLiveData<MovieSuggestion> getCurrentMovie() {
         if(currentMovie==null){
@@ -67,8 +70,24 @@ public class HomeViewModel extends ViewModel {
         return discoverItems;
     }
 
+    public ListLayoutType getListLayoutType() {
+        return listLayoutType;
+    }
+
+    public void setListLayoutType(ListLayoutType listLayoutType) {
+        this.listLayoutType = listLayoutType;
+    }
+
+
+
     public RecyclerView.LayoutManager getLayoutManager(Context context){
-        return new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false);
+        switch (listLayoutType) {
+            case LIST:
+                return new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false);
+            case GRID:
+                return new GridLayoutManager(context,3, LinearLayoutManager.VERTICAL,false);
+        }
+        return null;
     }
     public void loadSuggestions() {
         ApiManager.getInstance().getMovieSuggestions(

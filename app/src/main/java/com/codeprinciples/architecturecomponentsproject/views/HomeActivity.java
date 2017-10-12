@@ -50,6 +50,7 @@ public class HomeActivity extends AppCompatActivity {
         setFragment(R.id.container, SuggestionListFragment.class);
 
         if(binding.detailFragment==null) {//phone or tablet portrait
+            homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.GRID);
             homeViewModel.getCurrentMovie().observe(this, movieSuggestion ->{
                 if(movieSuggestion!=null)
                     setFragment(R.id.container, DetailFragment.class);
@@ -57,6 +58,7 @@ public class HomeActivity extends AppCompatActivity {
                     setFragment(R.id.container, SuggestionListFragment.class);
             });
         }else{//tablet landscape
+            homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.LIST);
             setFragment(R.id.detail_fragment, DetailFragment.class);
         }
     }
