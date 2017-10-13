@@ -41,7 +41,6 @@ public class SuggestionListFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         HomeViewModel homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
         homeViewModel.getSuggestionsObservableList();
-        homeViewModel.loadSuggestions();
         binding.setHomeViewModel(homeViewModel);
     }
 }

@@ -13,30 +13,20 @@
 
 package com.codeprinciples.architecturecomponentsproject.models;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+public class Parameter<T> {
+    private String key;
+    private T value;
 
-import com.codeprinciples.architecturecomponentsproject.database.CacheItem;
-import com.google.gson.annotations.SerializedName;
-@Entity
-public class Configuration implements CacheItem {
-    @PrimaryKey(autoGenerate = true)
-    public int id;
-    @SerializedName("images")
-    @Embedded
-    public Images images;
-
-    public long timeStamp = System.currentTimeMillis();//time stamp when updated
-
-
-    @Override
-    public boolean canUseCashed() {
-        return timeStamp+getCacheLifeTimeMilli()>System.currentTimeMillis();
+    public Parameter(String key, T value) {
+        this.key = key;
+        this.value = value;
     }
 
-    @Override
-    public long getCacheLifeTimeMilli() {
-        return 60*60*1000;
+    public String getKey() {
+        return key;
+    }
+
+    public T getValue() {
+        return value;
     }
 }

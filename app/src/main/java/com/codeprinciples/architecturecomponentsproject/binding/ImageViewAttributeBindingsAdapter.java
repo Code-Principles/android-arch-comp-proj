@@ -54,7 +54,7 @@ public class ImageViewAttributeBindingsAdapter {
         if(POSTER_BASE_URL==null)
         {
             AppDatabase.executeAsync(() -> {
-                Configuration config = AppDatabase.getInstance().configurationDao().get();
+                Configuration config = AppDatabase.getInstance().configurationDao().getSingle();
                 if(config!=null&&config.images!=null&&config.images.baseUrl!=null) {
                     POSTER_BASE_URL = config.images.baseUrl + getSizeValue(config.images.posterSizes, posterSize);
                 }

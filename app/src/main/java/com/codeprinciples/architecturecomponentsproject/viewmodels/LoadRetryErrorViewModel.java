@@ -11,32 +11,13 @@
  *
  */
 
-package com.codeprinciples.architecturecomponentsproject.models;
+package com.codeprinciples.architecturecomponentsproject.viewmodels;
 
-import android.arch.persistence.room.Embedded;
-import android.arch.persistence.room.Entity;
-import android.arch.persistence.room.PrimaryKey;
+import android.databinding.ObservableField;
 
-import com.codeprinciples.architecturecomponentsproject.database.CacheItem;
-import com.google.gson.annotations.SerializedName;
-@Entity
-public class Configuration implements CacheItem {
-    @PrimaryKey(autoGenerate = true)
-    public int id;
-    @SerializedName("images")
-    @Embedded
-    public Images images;
+import com.codeprinciples.architecturecomponentsproject.models.Resource;
 
-    public long timeStamp = System.currentTimeMillis();//time stamp when updated
-
-
-    @Override
-    public boolean canUseCashed() {
-        return timeStamp+getCacheLifeTimeMilli()>System.currentTimeMillis();
-    }
-
-    @Override
-    public long getCacheLifeTimeMilli() {
-        return 60*60*1000;
-    }
+public interface LoadRetryErrorViewModel {
+    ObservableField<Resource.Error> getError();
+    void onRetryClick();
 }

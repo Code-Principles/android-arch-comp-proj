@@ -56,6 +56,11 @@ public class DetailFragment extends Fragment {
     private FragmentDetailBinding binding;
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         binding = DataBindingUtil.inflate(inflater,R.layout.fragment_detail, container, false);
@@ -65,11 +70,18 @@ public class DetailFragment extends Fragment {
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        //testing
         HomeViewModel homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
-        homeViewModel.getCurrentMovie().observe(this, movieSuggestion -> {
+        homeViewModel.getSelectedMovieSuggestion().observe(this, movieSuggestion -> {
             if(movieSuggestion!=null){
-                binding.detailText.setText("selected movieId: "+movieSuggestion.id);
+                homeViewModel.getMovieDetails(movieSuggestion.id).observe(this, movieResource -> { //observer called multiple times needs fix. possibly will be fixed in arch comp library
+                    if(movieResource!=null&&movieResource.getData()!=null) {
+                        binding.detailText.setText("selected movie detail: "+movieResource.getData().overview);
+                    }else if(movieResource!=null&&movieResource.getError()!=null){
+                        //homeViewModel.setErrorState(movieResource.getError());//todo:handle errors and loading
+                    }else{
+                        //homeViewModel.setErrorState(new Resource.Error(0,"Unknown Error. Please Try Again."));
+                    }
+                });
             }else{
                 binding.detailText.setText("nothing selected");
             }

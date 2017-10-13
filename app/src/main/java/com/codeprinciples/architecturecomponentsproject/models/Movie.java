@@ -4,6 +4,7 @@ import android.arch.persistence.room.ColumnInfo;
 import android.arch.persistence.room.Entity;
 import android.arch.persistence.room.PrimaryKey;
 
+import com.codeprinciples.architecturecomponentsproject.database.CacheItem;
 import com.google.gson.annotations.SerializedName;
 
 /**
@@ -31,7 +32,7 @@ import com.google.gson.annotations.SerializedName;
  */
 
     @Entity
-public class Movie {
+public class Movie implements CacheItem{
     @SerializedName("id")
     @PrimaryKey
     public int id;
@@ -67,6 +68,8 @@ public class Movie {
     @SerializedName("vote_count")
     public int voteCount;
 
+    public long timeStamp = System.currentTimeMillis();//time stamp when updated
+
     @Override
     public String toString() {
         return "Movie{" +
@@ -87,5 +90,15 @@ public class Movie {
                 ", voteAverage=" + voteAverage +
                 ", voteCount=" + voteCount +
                 '}';
+    }
+
+    @Override
+    public boolean canUseCashed() {
+        return timeStamp+getCacheLifeTimeMilli()>System.currentTimeMillis();
+    }
+
+    @Override
+    public long getCacheLifeTimeMilli() {
+        return 24*60*60*1000;
     }
 }

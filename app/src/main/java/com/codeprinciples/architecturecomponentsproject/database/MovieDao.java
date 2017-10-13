@@ -34,11 +34,32 @@ import java.util.List;
  * SOFTWARE.
  */
 @Dao
-public interface MovieDao {
+public interface MovieDao extends BaseDao<Movie>{
+    @Override
+    @Query("SELECT * FROM movie LIMIT 1")
+    Movie getSingle();
+
+    @Override
     @Query("SELECT * FROM movie")
-    List<Movie> getAll();
+    List<Movie> get();
+
+    @Override
+    @Query("SELECT * FROM movie WHERE id = :idValue")
+    Movie getWithId( int idValue);
+
+    @Override
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertAll(Movie... movies);
+    void setSingle(Movie movie);
+
+    @Override
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void set(List<Movie> items);
+
+    @Override
     @Delete
-    void delete(Movie movie);
+    void deleteSingle(Movie movie);
+
+    @Override
+    @Delete
+    void delete(List<Movie> items);
 }

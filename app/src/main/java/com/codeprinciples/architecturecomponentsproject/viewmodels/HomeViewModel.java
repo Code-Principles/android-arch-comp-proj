@@ -14,9 +14,10 @@ import com.codeprinciples.architecturecomponentsproject.BR;
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.binding.RecyclerViewBindingAdapter;
-import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
+import com.codeprinciples.architecturecomponentsproject.models.Resource;
+import com.codeprinciples.architecturecomponentsproject.repo.Repository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,19 +49,23 @@ import java.util.List;
 public class HomeViewModel extends ViewModel {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
-    private MutableLiveData<MovieSuggestion> currentMovie;
+    private MutableLiveData<MovieSuggestion> selectedMovieSuggestion;
+    private MutableLiveData<Resource<Movie>> movieDetails;
     public enum ListLayoutType {LIST,GRID}
     private ListLayoutType listLayoutType;
 
-    public MutableLiveData<MovieSuggestion> getCurrentMovie() {
-        if(currentMovie==null){
-            currentMovie = new MutableLiveData<>();
+    public MutableLiveData<MovieSuggestion> getSelectedMovieSuggestion() {
+        if(selectedMovieSuggestion ==null){
+            selectedMovieSuggestion = new MutableLiveData<>();
+            loadSuggestions();
         }
-        return currentMovie;
+        return selectedMovieSuggestion;
     }
 
-    public void setCurrentMovie(MovieSuggestion currentMovie) {
-        getCurrentMovie().setValue(currentMovie);
+    public void setSelectedMovieSuggestion(MovieSuggestion selectedMovieSuggestion) {
+        if(movieDetails!=null)
+            movieDetails.setValue(null);//always reset details as they depend on selected suggestion
+        getSelectedMovieSuggestion().setValue(selectedMovieSuggestion);
     }
 
     public ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> getSuggestionsObservableList() {
@@ -70,15 +75,9 @@ public class HomeViewModel extends ViewModel {
         return discoverItems;
     }
 
-    public ListLayoutType getListLayoutType() {
-        return listLayoutType;
-    }
-
     public void setListLayoutType(ListLayoutType listLayoutType) {
         this.listLayoutType = listLayoutType;
     }
-
-
 
     public RecyclerView.LayoutManager getLayoutManager(Context context){
         switch (listLayoutType) {
@@ -89,29 +88,24 @@ public class HomeViewModel extends ViewModel {
         }
         return null;
     }
+
+    public MutableLiveData<Resource<Movie>> getMovieDetails(int id) {
+        //setErrorState(null);
+        if(movieDetails==null)
+            movieDetails = new MutableLiveData<>();
+        if(movieDetails.getValue()==null || movieDetails.getValue().getData()==null)
+            Repository.getInstance().getMovie(movieDetails, id);
+        return movieDetails;
+    }
+
     public void loadSuggestions() {
         ApiManager.getInstance().getMovieSuggestions(
                 (obj) -> discoverItems.addAll(convert(obj.results)),
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
     }
 
-    private void loadMovieDetails(MovieSuggestion movieSuggestion) {
-        ApiManager.getInstance().getMovie(movieSuggestion.id,
-                obj -> AppDatabase.executeAsync(
-                        () -> {
-                            AppDatabase.getInstance().movieDao().insertAll(obj);
-                            updateUI(obj);
-                        },
-                        () -> Log.i(TAG,"Finished writing to database.")),
-                (code, msg) -> Log.e(TAG, "Failed loading movie details: " + msg));
-    }
-
-    private void updateUI(Movie obj) {
-        //todo
-    }
-
     public void onSuggestionClick(MovieSuggestion movieSuggestion){
-        setCurrentMovie(movieSuggestion);
+        setSelectedMovieSuggestion(movieSuggestion);
     }
 
     private List<RecyclerViewBindingAdapter.AdapterDataItem> convert(List<MovieSuggestion> suggestions) {
@@ -129,7 +123,4 @@ public class HomeViewModel extends ViewModel {
                 new Pair<>(BR.movieSuggestion,item));
     }
 
-    public interface OnSuggestionClicked{
-        void onClick();
-    }
 }

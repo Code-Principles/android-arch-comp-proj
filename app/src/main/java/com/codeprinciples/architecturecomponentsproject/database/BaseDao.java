@@ -13,43 +13,14 @@
 
 package com.codeprinciples.architecturecomponentsproject.database;
 
-import android.arch.persistence.room.Dao;
-import android.arch.persistence.room.Delete;
-import android.arch.persistence.room.Insert;
-import android.arch.persistence.room.OnConflictStrategy;
-import android.arch.persistence.room.Query;
-
-import com.codeprinciples.architecturecomponentsproject.models.Configuration;
-
 import java.util.List;
 
-@Dao
-public interface  ConfigurationDao extends BaseDao<Configuration>{
-    @Override
-    @Query("SELECT * FROM configuration LIMIT 1")
-    Configuration getSingle();
-
-    @Override
-    @Query("SELECT * FROM configuration")
-    List<Configuration> get();
-
-    @Override
-    @Query("SELECT * FROM configuration WHERE id = :idValue")
-    Configuration getWithId(int idValue);
-
-    @Override
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void setSingle(Configuration configuration);
-
-    @Override
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void set(List<Configuration> items);
-
-    @Override
-    @Delete
-    void deleteSingle(Configuration configuration);
-
-    @Override
-    @Delete
-    void delete(List<Configuration> items);
+public interface BaseDao<T> {
+    T getSingle();
+    List<T> get();
+    T getWithId(int idValue);
+    void setSingle(T item);
+    void set(List<T> items);
+    void deleteSingle(T item);
+    void delete(List<T> items);
 }

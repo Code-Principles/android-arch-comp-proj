@@ -18,6 +18,7 @@ import android.arch.lifecycle.MutableLiveData;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
 import com.codeprinciples.architecturecomponentsproject.models.Configuration;
+import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
 
 public class Repository {
@@ -29,16 +30,17 @@ public class Repository {
 
     private Repository() {
     }
+
     public void getConfig(MutableLiveData<Resource<Configuration>> configurationMutableLiveData){
         AppDatabase.executeAsync(() -> {
-            Configuration config= AppDatabase.getInstance().configurationDao().get();
+            Configuration config= AppDatabase.getInstance().configurationDao().getSingle();
             if(config == null){
                 loadConfigFromNetwork(configurationMutableLiveData);
             }else{
                 if(config.canUseCashed())
                     configurationMutableLiveData.postValue(new Resource<>(config));
                 else {
-                    AppDatabase.getInstance().configurationDao().delete(config);
+                    AppDatabase.getInstance().configurationDao().deleteSingle(config);
                     loadConfigFromNetwork(configurationMutableLiveData);
                 }
             }
@@ -48,8 +50,32 @@ public class Repository {
 
     private void loadConfigFromNetwork(MutableLiveData<Resource<Configuration>> configurationMutableLiveData) {
         ApiManager.getInstance().getConfiguration(obj -> {
-            AppDatabase.executeAsync(() -> AppDatabase.getInstance().configurationDao().set(obj));
+            AppDatabase.executeAsync(() -> AppDatabase.getInstance().configurationDao().setSingle(obj));
             configurationMutableLiveData.setValue(new Resource<>(obj));
         }, (code, msg) -> configurationMutableLiveData.setValue(new Resource<>(new Resource.Error(code,msg))));
+    }
+
+    public void getMovie(MutableLiveData<Resource<Movie>> movieMutableLiveData, int id){
+        AppDatabase.executeAsync(() -> {
+            Movie movie= AppDatabase.getInstance().movieDao().getWithId( id);
+            if(movie == null){
+                loadMovieFromNetwork(movieMutableLiveData,id);
+            }else{
+                if(movie.canUseCashed())
+                    movieMutableLiveData.postValue(new Resource<>(movie));
+                else {
+                    AppDatabase.getInstance().movieDao().deleteSingle(movie);
+                    loadMovieFromNetwork(movieMutableLiveData, id);
+                }
+            }
+        });
+
+    }
+
+    private void loadMovieFromNetwork(MutableLiveData<Resource<Movie>> movieMutableLiveData, int id) {
+        ApiManager.getInstance().getMovie(id, obj -> {
+            AppDatabase.executeAsync(() -> AppDatabase.getInstance().movieDao().setSingle(obj));
+            movieMutableLiveData.setValue(new Resource<>(obj));
+        }, (code, msg) -> movieMutableLiveData.setValue(new Resource<>(new Resource.Error(code,msg))));
     }
 }

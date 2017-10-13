@@ -21,7 +21,7 @@ import com.codeprinciples.architecturecomponentsproject.models.Configuration;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
 import com.codeprinciples.architecturecomponentsproject.repo.Repository;
 
-public class LauncherViewModel extends ViewModel {
+public class LauncherViewModel extends ViewModel implements LoadRetryErrorViewModel {
     private MutableLiveData<Resource<Configuration>> configuration;
     private ObservableField<Resource.Error> error;
 
@@ -35,10 +35,16 @@ public class LauncherViewModel extends ViewModel {
         return configuration;
     }
 
+    @Override
     public ObservableField<Resource.Error> getError() {
         if(error==null)
             error = new ObservableField<>();
         return error;
+    }
+
+    @Override
+    public void onRetryClick() {
+        getConfiguration();
     }
 
     public void setErrorState(Resource.Error err){

@@ -45,17 +45,17 @@ public class HomeActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         homeViewModel.getSuggestionsObservableList();
-        homeViewModel.loadSuggestions();
 
         setFragment(R.id.container, SuggestionListFragment.class);
 
         if(binding.detailFragment==null) {//phone or tablet portrait
             homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.GRID);
-            homeViewModel.getCurrentMovie().observe(this, movieSuggestion ->{
-                if(movieSuggestion!=null)
+            homeViewModel.getSelectedMovieSuggestion().observe(this, movieSuggestion ->{
+                if(movieSuggestion!=null) {
                     setFragment(R.id.container, DetailFragment.class);
-                else
+                }else {
                     setFragment(R.id.container, SuggestionListFragment.class);
+                }
             });
         }else{//tablet landscape
             homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.LIST);
@@ -72,8 +72,8 @@ public class HomeActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed(){
-        if (homeViewModel.getCurrentMovie().getValue()!=null) {
-            homeViewModel.setCurrentMovie(null);
+        if (homeViewModel.getSelectedMovieSuggestion().getValue()!=null) {
+            homeViewModel.setSelectedMovieSuggestion(null);
         } else {
             super.onBackPressed();
         }
