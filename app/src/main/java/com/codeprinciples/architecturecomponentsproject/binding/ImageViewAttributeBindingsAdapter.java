@@ -64,17 +64,32 @@ public class ImageViewAttributeBindingsAdapter {
         }
     }
 
-    private static String getSizeValue(List<String> posterSizes, ApiAssetSize size) {
-        if(posterSizes!=null){
+    @BindingAdapter({"android:backdropUrl", "android:error","android:placeholder", "android:backdropSize"})
+    public static void loadBackdropImage(ImageView view, String backdropUrl, Drawable error,Drawable placeHolder, ApiAssetSize backdropSize) {
+        if(POSTER_BASE_URL==null)
+        {
+            AppDatabase.executeAsync(() -> {
+                Configuration config = AppDatabase.getInstance().configurationDao().getSingle();
+                if(config!=null&&config.images!=null&&config.images.baseUrl!=null) {
+                    POSTER_BASE_URL = config.images.baseUrl + getSizeValue(config.images.backdropSizes, backdropSize);
+                }
+            }, () -> Picasso.with(view.getContext()).load(POSTER_BASE_URL + backdropUrl).error(error).placeholder(placeHolder).into(view));
+        }else {
+            Picasso.with(view.getContext()).load(POSTER_BASE_URL + backdropUrl).error(error).placeholder(placeHolder).into(view);
+        }
+    }
+
+    private static String getSizeValue(List<String> sizes, ApiAssetSize size) {
+        if(sizes!=null){
             switch (size) {
                 case SMALL:
-                    posterSizes.get(0);
+                    sizes.get(0);
                     break;
                 case MED:
-                    posterSizes.get(posterSizes.size()/2);
+                    sizes.get(sizes.size()/2);
                     break;
                 case LARGE:
-                    posterSizes.get(posterSizes.size()-1);
+                    sizes.get(sizes.size()-1);
                     break;
             }
         }

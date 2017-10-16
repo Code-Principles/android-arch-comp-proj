@@ -75,7 +75,7 @@ public class DetailFragment extends Fragment {
             if(movieSuggestion!=null){
                 homeViewModel.getMovieDetails(movieSuggestion.id).observe(this, movieResource -> { //observer called multiple times needs fix. possibly will be fixed in arch comp library
                     if(movieResource!=null&&movieResource.getData()!=null) {
-                        binding.detailText.setText("selected movie detail: "+movieResource.getData().overview);
+                        binding.setMovieModel(movieResource.getData());
                     }else if(movieResource!=null&&movieResource.getError()!=null){
                         //homeViewModel.setErrorState(movieResource.getError());//todo:handle errors and loading
                     }else{
