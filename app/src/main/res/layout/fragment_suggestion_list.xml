@@ -12,22 +12,46 @@
   -->
 <layout>
 <data>
+    <import type="android.text.TextUtils"/>
     <variable
         name="homeViewModel"
         type="com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel"/>
 </data>
-<android.support.v7.widget.RecyclerView android:id="@+id/recyclerView"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginEnd="8dp"
-    android:layout_marginStart="8dp"
-    android:layout_marginTop="8dp"
-    android:layoutManager="@{homeViewModel.getLayoutManager(recyclerView.getContext())}"
-    app:layout_constraintBottom_toBottomOf="parent"
-    app:layout_constraintEnd_toEndOf="parent"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toTopOf="parent"
-    android:list="@{homeViewModel.getSuggestionsObservableList()}"
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto" />
+    <RelativeLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <android.support.v7.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="?attr/actionBarSize"
+            android:background="@color/colorPrimary"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+            <SearchView
+                android:id="@+id/searchView"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:onQueryTextSubmit="@{homeViewModel}"
+                android:onClose="@{()->homeViewModel.onSearchClear()}"
+                android:onQueryTextFocusChange="@{(v,hasFocus)->homeViewModel.setSearchMode(hasFocus)}"/>
+
+        </android.support.v7.widget.Toolbar>
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginTop="8dp"
+            android:layoutManager="@{homeViewModel.getLayoutManager(recyclerView.getContext())}"
+            android:layout_below="@+id/toolbar"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:list="@{homeViewModel.getSuggestionsObservableList()}" />
+    </RelativeLayout>
+
 </layout>

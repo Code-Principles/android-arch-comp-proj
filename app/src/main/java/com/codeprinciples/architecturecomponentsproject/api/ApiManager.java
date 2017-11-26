@@ -7,6 +7,7 @@ import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.facebook.stetho.okhttp3.StethoInterceptor;
 
 import java.io.IOException;
+import java.lang.ref.WeakReference;
 
 import okhttp3.HttpUrl;
 import okhttp3.Interceptor;
@@ -46,6 +47,9 @@ public class ApiManager {
     private static final String TAG = "ApiManager";
     private static final ApiManager ourInstance = new ApiManager();
     private final MovieApiEndoitInterfcae apiService;
+
+    //cancelable calls
+    private WeakReference<Call<DiscoverMoviesRequest>> queryCall;
 
     public static ApiManager getInstance() {
         return ourInstance;
@@ -91,6 +95,16 @@ public class ApiManager {
     public void getConfiguration(CallbackSuccess<Configuration> success, CallbackFailure failure){
         apiService.getConfiguration()
                 .enqueue(new LambdaHolderCallback<>(success,failure));
+    }
+
+    public void getMovieSuggestions(String query, CallbackSuccess<DiscoverMoviesRequest> success, CallbackFailure failure){
+        if(queryCall!=null && queryCall.get()!=null) {
+            queryCall.get().cancel();
+            queryCall = null;
+        }
+        Call<DiscoverMoviesRequest> call = apiService.getMovieSuggestions(query);
+        queryCall=new WeakReference<>(call);
+        call.enqueue(new LambdaHolderCallback<>(success,failure));
     }
 
     private class LambdaHolderCallback<T> implements retrofit2.Callback<T>{

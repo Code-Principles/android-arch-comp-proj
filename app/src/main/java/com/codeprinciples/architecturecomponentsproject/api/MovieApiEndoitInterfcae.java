@@ -7,6 +7,7 @@ import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
+import retrofit2.http.Query;
 
 /**
  * MIT License
@@ -39,4 +40,6 @@ public interface MovieApiEndoitInterfcae {
     Call<Movie> getMovie(@Path("movie_id")int movieId);
     @GET("configuration")
     Call<Configuration> getConfiguration();
+    @GET("search/movie")
+    Call<DiscoverMoviesRequest> getMovieSuggestions(@Query("query") String query);
 }

@@ -4,9 +4,11 @@ import android.arch.lifecycle.MutableLiveData;
 import android.arch.lifecycle.ViewModel;
 import android.content.Context;
 import android.databinding.ObservableArrayList;
+import android.databinding.adapters.SearchViewBindingAdapter;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.text.TextUtils;
 import android.util.Log;
 import android.util.Pair;
 
@@ -46,13 +48,15 @@ import java.util.List;
  * SOFTWARE.
  */
 
-public class HomeViewModel extends ViewModel {
+public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter.OnQueryTextSubmit {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
     private MutableLiveData<MovieSuggestion> selectedMovieSuggestion;
     private MutableLiveData<Resource<Movie>> movieDetails;
+
     public enum ListLayoutType {LIST,GRID}
     private ListLayoutType listLayoutType;
+    private RecyclerViewBindingAdapter.AdapterDataItem loadingRowItem, searchInfoRowItem;
 
     public MutableLiveData<MovieSuggestion> getSelectedMovieSuggestion() {
         if(selectedMovieSuggestion ==null){
@@ -84,9 +88,24 @@ public class HomeViewModel extends ViewModel {
             case LIST:
                 return new LinearLayoutManager(context,LinearLayoutManager.VERTICAL,false);
             case GRID:
-                return new GridLayoutManager(context,3, LinearLayoutManager.VERTICAL,false);
+                GridLayoutManager gridLayoutManager = new GridLayoutManager(context,3, LinearLayoutManager.VERTICAL,false);
+                gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
+                    @Override
+                    public int getSpanSize(int position) {
+                        return lookUpRowSpan(position);
+                    }
+                });
+                return gridLayoutManager;
         }
         return null;
+    }
+
+    private int lookUpRowSpan(int position) {
+        RecyclerViewBindingAdapter.AdapterDataItem item = discoverItems.get(position);
+        if(item.equals(getLoadingRowItem()) || item.equals(getSearchInfoRowItem())){
+            return 3;
+        }
+        return 1;
     }
 
     public MutableLiveData<Resource<Movie>> getMovieDetails(int id) {
@@ -98,9 +117,25 @@ public class HomeViewModel extends ViewModel {
         return movieDetails;
     }
 
+    private RecyclerViewBindingAdapter.AdapterDataItem getLoadingRowItem(){
+        if(loadingRowItem==null)
+            loadingRowItem = new RecyclerViewBindingAdapter.AdapterDataItem(R.layout.layout_loading_item);
+        return loadingRowItem;
+    }
+
+    private RecyclerViewBindingAdapter.AdapterDataItem getSearchInfoRowItem(){
+        if(searchInfoRowItem==null)
+            searchInfoRowItem = new RecyclerViewBindingAdapter.AdapterDataItem(R.layout.layout_search_info_item);
+        return searchInfoRowItem;
+    }
+
     public void loadSuggestions() {
+        discoverItems.add(getLoadingRowItem());
         ApiManager.getInstance().getMovieSuggestions(
-                (obj) -> discoverItems.addAll(convert(obj.results)),
+                (obj) -> {
+                    discoverItems.remove(getLoadingRowItem());
+                    discoverItems.addAll(convert(obj.results));
+                    },
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
     }
 
@@ -122,5 +157,37 @@ public class HomeViewModel extends ViewModel {
                 new Pair<>( BR.homeViewModel, this),
                 new Pair<>(BR.movieSuggestion,item));
     }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        discoverItems.remove(getSearchInfoRowItem());
+        discoverItems.add(getLoadingRowItem());
+        if(!TextUtils.isEmpty(query))
+            ApiManager.getInstance().getMovieSuggestions(query,
+                    (obj) -> {
+                        discoverItems.remove(getLoadingRowItem());
+                        discoverItems.addAll(convert(obj.results));
+                    },
+                ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
+        else
+            loadSuggestions();
+        return false;
+    }
+
+    public boolean onSearchClear(){
+        setSearchMode(true);
+        return true;
+    }
+
+    public void setSearchMode(boolean isSearch){
+        if(isSearch){
+            discoverItems.clear();
+            discoverItems.add(getSearchInfoRowItem());
+        }else{
+            discoverItems.clear();
+            loadSuggestions();
+        }
+    }
+
 
 }
