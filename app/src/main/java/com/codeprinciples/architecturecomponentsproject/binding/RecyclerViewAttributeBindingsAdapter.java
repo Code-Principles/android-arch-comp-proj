@@ -4,6 +4,8 @@ import android.databinding.BindingAdapter;
 import android.databinding.ObservableList;
 import android.support.v7.widget.RecyclerView;
 
+import com.codeprinciples.easyrecycleradapter.EasyRecyclerAdapter;
+
 /**
  * MIT License
  * <p>
@@ -34,6 +36,6 @@ public class RecyclerViewAttributeBindingsAdapter {
         if (rv.getLayoutManager() == null)
             rv.setLayoutManager(layoutManager);
         if (rv.getAdapter() == null)
-            rv.setAdapter(new RecyclerViewBindingAdapter(dataItems));
+            rv.setAdapter(new EasyRecyclerAdapter(dataItems));
     }
 }

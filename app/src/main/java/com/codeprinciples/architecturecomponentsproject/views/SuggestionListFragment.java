@@ -42,5 +42,7 @@ public class SuggestionListFragment extends Fragment {
         HomeViewModel homeViewModel = ViewModelProviders.of(getActivity()).get(HomeViewModel.class);
         homeViewModel.getSuggestionsObservableList();
         binding.setHomeViewModel(homeViewModel);
+        binding.recyclerView.setLayoutManager(homeViewModel.getLayoutManager(getContext()));
+        binding.recyclerView.setAdapter(homeViewModel.getAdapter());
     }
 }

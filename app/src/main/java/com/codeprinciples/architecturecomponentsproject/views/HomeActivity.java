@@ -4,6 +4,7 @@ import android.arch.lifecycle.ViewModelProviders;
 import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.IdRes;
+import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 
 import com.codeprinciples.architecturecomponentsproject.R;
@@ -38,6 +39,8 @@ public class HomeActivity extends AppCompatActivity {
     private static final String TAG = "HomeActivity";
     private ActivityHomeBinding binding;
     private HomeViewModel homeViewModel;
+    private SuggestionListFragment suggestionListFragment;
+    private DetailFragment detailFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,25 +48,26 @@ public class HomeActivity extends AppCompatActivity {
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
         homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
         homeViewModel.getSuggestionsObservableList();
-
-        setFragment(R.id.container, SuggestionListFragment.class);
+        suggestionListFragment = new SuggestionListFragment();
+        detailFragment = new DetailFragment();
+        setFragment(R.id.container, suggestionListFragment);
 
         if(binding.detailFragment==null) {//phone or tablet portrait
             homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.GRID);
             homeViewModel.getSelectedMovieSuggestion().observe(this, movieSuggestion ->{
                 if(movieSuggestion!=null) {
-                    setFragment(R.id.container, DetailFragment.class);
+                    setFragment(R.id.container, detailFragment);
                 }else {
-                    setFragment(R.id.container, SuggestionListFragment.class);
+                    setFragment(R.id.container, suggestionListFragment);
                 }
             });
         }else{//tablet landscape
             homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.LIST);
-            setFragment(R.id.detail_fragment, DetailFragment.class);
+            setFragment(R.id.detail_fragment, detailFragment);
         }
     }
 
-    private void setFragment(@IdRes int id, Class<?> fragment){
+    private void setFragment(@IdRes int id, Fragment fragment){
         Utils.setFragmentIfNotExists(getSupportFragmentManager(),
                 id,
                 fragment,

@@ -10,19 +10,15 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.TextUtils;
 import android.util.Log;
-import android.util.Pair;
 
 import com.codeprinciples.architecturecomponentsproject.BR;
 import com.codeprinciples.architecturecomponentsproject.R;
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
-import com.codeprinciples.architecturecomponentsproject.binding.RecyclerViewBindingAdapter;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
 import com.codeprinciples.architecturecomponentsproject.repo.Repository;
-
-import java.util.ArrayList;
-import java.util.List;
+import com.codeprinciples.easyrecycleradapter.EasyRecyclerAdapter;
 
 /**
  * MIT License
@@ -50,13 +46,22 @@ import java.util.List;
 
 public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter.OnQueryTextSubmit {
     private static final String TAG = "HomeViewModel";
-    private ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> discoverItems;
+    private ObservableArrayList<Object> discoverItems;
     private MutableLiveData<MovieSuggestion> selectedMovieSuggestion;
     private MutableLiveData<Resource<Movie>> movieDetails;
-
     public enum ListLayoutType {LIST,GRID}
     private ListLayoutType listLayoutType;
-    private RecyclerViewBindingAdapter.AdapterDataItem loadingRowItem, searchInfoRowItem;
+    private LoadingItemViewModel loadingRowItem;
+    private SearchInfoItemViewModel searchInfoRowItem;
+
+    public RecyclerView.Adapter getAdapter() {
+
+        EasyRecyclerAdapter easyRecyclerAdapter = new EasyRecyclerAdapter(getSuggestionsObservableList());
+        easyRecyclerAdapter.addMapping(R.layout.layout_discover_movie, BR.movieSuggestion, MovieSuggestion.class)
+                .addMapping(R.layout.layout_loading_item, BR.loadingItemViewModel, LoadingItemViewModel.class)
+                .addMapping(R.layout.layout_search_info_item, BR.searchInfoViewModel, SearchInfoItemViewModel.class);
+        return easyRecyclerAdapter;
+    }
 
     public MutableLiveData<MovieSuggestion> getSelectedMovieSuggestion() {
         if(selectedMovieSuggestion ==null){
@@ -72,7 +77,7 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
         getSelectedMovieSuggestion().setValue(selectedMovieSuggestion);
     }
 
-    public ObservableArrayList<RecyclerViewBindingAdapter.AdapterDataItem> getSuggestionsObservableList() {
+    public ObservableArrayList<Object> getSuggestionsObservableList() {
         if(discoverItems==null){
             discoverItems = new ObservableArrayList<>();
         }
@@ -101,7 +106,7 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
     }
 
     private int lookUpRowSpan(int position) {
-        RecyclerViewBindingAdapter.AdapterDataItem item = discoverItems.get(position);
+        Object item = discoverItems.get(position);
         if(item.equals(getLoadingRowItem()) || item.equals(getSearchInfoRowItem())){
             return 3;
         }
@@ -117,15 +122,15 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
         return movieDetails;
     }
 
-    private RecyclerViewBindingAdapter.AdapterDataItem getLoadingRowItem(){
+    private LoadingItemViewModel getLoadingRowItem(){
         if(loadingRowItem==null)
-            loadingRowItem = new RecyclerViewBindingAdapter.AdapterDataItem(R.layout.layout_loading_item);
+            loadingRowItem = new LoadingItemViewModel();
         return loadingRowItem;
     }
 
-    private RecyclerViewBindingAdapter.AdapterDataItem getSearchInfoRowItem(){
+    private SearchInfoItemViewModel getSearchInfoRowItem(){
         if(searchInfoRowItem==null)
-            searchInfoRowItem = new RecyclerViewBindingAdapter.AdapterDataItem(R.layout.layout_search_info_item);
+            searchInfoRowItem = new SearchInfoItemViewModel();
         return searchInfoRowItem;
     }
 
@@ -134,7 +139,7 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
         ApiManager.getInstance().getMovieSuggestions(
                 (obj) -> {
                     discoverItems.remove(getLoadingRowItem());
-                    discoverItems.addAll(convert(obj.results));
+                    discoverItems.addAll(obj.results);
                     },
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
     }
@@ -143,20 +148,6 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
         setSelectedMovieSuggestion(movieSuggestion);
     }
 
-    private List<RecyclerViewBindingAdapter.AdapterDataItem> convert(List<MovieSuggestion> suggestions) {
-        List<RecyclerViewBindingAdapter.AdapterDataItem> items = new ArrayList<>();
-        for (MovieSuggestion item : suggestions) {
-            items.add(convert(item));
-        }
-        return items;
-    }
-
-    private RecyclerViewBindingAdapter.AdapterDataItem convert(MovieSuggestion item) {
-        return new RecyclerViewBindingAdapter.AdapterDataItem(
-                R.layout.layout_discover_movie,
-                new Pair<>( BR.homeViewModel, this),
-                new Pair<>(BR.movieSuggestion,item));
-    }
 
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -166,16 +157,19 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
             ApiManager.getInstance().getMovieSuggestions(query,
                     (obj) -> {
                         discoverItems.remove(getLoadingRowItem());
-                        discoverItems.addAll(convert(obj.results));
+                        discoverItems.addAll(obj.results);
                     },
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
-        else
+        else {
+            discoverItems.clear();
             loadSuggestions();
+        }
         return false;
     }
 
     public boolean onSearchClear(){
-        setSearchMode(true);
+        discoverItems.clear();
+        loadSuggestions();
         return true;
     }
 
@@ -183,9 +177,6 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
         if(isSearch){
             discoverItems.clear();
             discoverItems.add(getSearchInfoRowItem());
-        }else{
-            discoverItems.clear();
-            loadSuggestions();
         }
     }
 

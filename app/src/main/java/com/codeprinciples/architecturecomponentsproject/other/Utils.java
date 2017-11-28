@@ -32,4 +32,17 @@ public class Utils {
             }
         }
     }
+    public static void setFragmentIfNotExists(FragmentManager fragmentManager, @IdRes int id, Fragment fragment, boolean addToBackStack){
+        if (fragmentManager.findFragmentById(id) == null || fragmentManager.findFragmentById(id)!= fragment) {
+            try {
+                FragmentTransaction ft =fragmentManager.beginTransaction();
+                ft.replace(id, fragment);
+                if(addToBackStack)
+                    ft.addToBackStack(null);
+                ft.commit();
+            }catch (Exception e){
+                e.printStackTrace();
+            }
+        }
+    }
 }
