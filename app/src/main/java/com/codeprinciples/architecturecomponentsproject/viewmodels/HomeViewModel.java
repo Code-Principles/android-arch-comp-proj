@@ -13,10 +13,10 @@ import android.util.Log;
 
 import com.codeprinciples.architecturecomponentsproject.BR;
 import com.codeprinciples.architecturecomponentsproject.R;
-import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
+import com.codeprinciples.architecturecomponentsproject.other.OnItemClickListener;
 import com.codeprinciples.architecturecomponentsproject.repo.Repository;
 import com.codeprinciples.easyrecycleradapter.EasyRecyclerAdapter;
 
@@ -44,11 +44,17 @@ import com.codeprinciples.easyrecycleradapter.EasyRecyclerAdapter;
  * SOFTWARE.
  */
 
-public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter.OnQueryTextSubmit {
+public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter.OnQueryTextSubmit, OnItemClickListener<SuggestionItemViewModel> {
     private static final String TAG = "HomeViewModel";
     private ObservableArrayList<Object> discoverItems;
     private MutableLiveData<MovieSuggestion> selectedMovieSuggestion;
     private MutableLiveData<Resource<Movie>> movieDetails;
+
+    @Override
+    public void onItemClick(SuggestionItemViewModel item) {
+        setSelectedMovieSuggestion(item.getMovieSuggestion());
+    }
+
     public enum ListLayoutType {LIST,GRID}
     private ListLayoutType listLayoutType;
     private LoadingItemViewModel loadingRowItem;
@@ -57,7 +63,7 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
     public RecyclerView.Adapter getAdapter() {
 
         EasyRecyclerAdapter easyRecyclerAdapter = new EasyRecyclerAdapter(getSuggestionsObservableList());
-        easyRecyclerAdapter.addMapping(R.layout.layout_discover_movie, BR.movieSuggestion, MovieSuggestion.class)
+        easyRecyclerAdapter.addMapping(R.layout.layout_discover_movie, BR.movieSuggestionViewModel, SuggestionItemViewModel.class)
                 .addMapping(R.layout.layout_loading_item, BR.loadingItemViewModel, LoadingItemViewModel.class)
                 .addMapping(R.layout.layout_search_info_item, BR.searchInfoViewModel, SearchInfoItemViewModel.class);
         return easyRecyclerAdapter;
@@ -136,28 +142,27 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
 
     public void loadSuggestions() {
         discoverItems.add(getLoadingRowItem());
-        ApiManager.getInstance().getMovieSuggestions(
+        Repository.getInstance().getMovieSuggestions(
                 (obj) -> {
                     discoverItems.remove(getLoadingRowItem());
-                    discoverItems.addAll(obj.results);
+                    for(MovieSuggestion movieSuggestion: obj.results){
+                        discoverItems.add(new SuggestionItemViewModel(movieSuggestion,this));
+                    }
                     },
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
     }
-
-    public void onSuggestionClick(MovieSuggestion movieSuggestion){
-        setSelectedMovieSuggestion(movieSuggestion);
-    }
-
 
     @Override
     public boolean onQueryTextSubmit(String query) {
         discoverItems.remove(getSearchInfoRowItem());
         discoverItems.add(getLoadingRowItem());
         if(!TextUtils.isEmpty(query))
-            ApiManager.getInstance().getMovieSuggestions(query,
+            Repository.getInstance().getMovieSuggestions(query,
                     (obj) -> {
                         discoverItems.remove(getLoadingRowItem());
-                        discoverItems.addAll(obj.results);
+                        for(MovieSuggestion movieSuggestion: obj.results){
+                            discoverItems.add(new SuggestionItemViewModel(movieSuggestion,this));
+                        }
                     },
                 ((code, msg) -> Log.e(TAG,"Failed loading suggestions:" + msg)));//just first item for now
         else {

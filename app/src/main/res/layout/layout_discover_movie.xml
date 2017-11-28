@@ -6,12 +6,8 @@
         <import type="com.codeprinciples.architecturecomponentsproject.binding.ApiAssetSize" />
 
         <variable
-            name="homeViewModel"
-            type="com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel" />
-
-        <variable
-            name="movieSuggestion"
-            type="com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion" />
+            name="movieSuggestionViewModel"
+            type="com.codeprinciples.architecturecomponentsproject.viewmodels.SuggestionItemViewModel" />
     </data>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -19,7 +15,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="4dp"
         android:paddingBottom="4dp"
-        android:onClick="@{()->homeViewModel.onSuggestionClick(movieSuggestion)}">
+        android:onClick="@{()->movieSuggestionViewModel.onClick()}">
 
         <ImageView
             android:id="@+id/image"
@@ -29,7 +25,7 @@
             android:error="@{@drawable/ic_broken_image}"
             android:placeholder="@{@drawable/ic_image}"
             android:posterSize="@{ApiAssetSize.MED}"
-            android:posterUrl="@{movieSuggestion.posterPath}"
+            android:posterUrl="@{movieSuggestionViewModel.movieSuggestion.posterPath}"
             tools:src="@drawable/ic_android" />
 
         <TextView
@@ -39,7 +35,7 @@
             android:layout_below="@+id/image"
             android:maxLines="2"
             android:minLines="2"
-            android:text="@{movieSuggestion.title}"
+            android:text="@{movieSuggestionViewModel.movieSuggestion.title}"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -51,7 +47,7 @@
             android:layout_toLeftOf="@id/whatshot"
             android:gravity="right"
             android:maxLines="1"
-            android:text="@{String.valueOf(movieSuggestion.voteAverage)}" />
+            android:text="@{String.valueOf(movieSuggestionViewModel.movieSuggestion.voteAverage)}" />
 
         <ImageView
             android:id="@+id/whatshot"

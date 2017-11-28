@@ -6,19 +6,15 @@
         <import type="com.codeprinciples.architecturecomponentsproject.binding.ApiAssetSize" />
 
         <variable
-            name="homeViewModel"
-            type="com.codeprinciples.architecturecomponentsproject.viewmodels.HomeViewModel" />
-
-        <variable
-            name="movieSuggestion"
-            type="com.codeprinciples.architecturecomponentsproject.models.MovieSuggestion" />
+            name="movieSuggestionViewModel"
+            type="com.codeprinciples.architecturecomponentsproject.viewmodels.SuggestionItemViewModel" />
     </data>
 
     <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="match_parent"
         android:layout_height="150dp"
         android:layout_margin="4dp"
-        android:onClick="@{()->homeViewModel.onSuggestionClick(movieSuggestion)}">
+        android:onClick="@{()->movieSuggestionViewModel.onClick()}">
 
         <ImageView
             android:id="@+id/image"
@@ -29,7 +25,7 @@
             android:error="@{@drawable/ic_broken_image}"
             android:placeholder="@{@drawable/ic_image}"
             android:posterSize="@{ApiAssetSize.LARGE}"
-            android:posterUrl="@{movieSuggestion.posterPath}" />
+            android:posterUrl="@{movieSuggestionViewModel.movieSuggestion.posterPath}" />
 
         <TextView
             android:id="@+id/movie_title"
@@ -37,7 +33,7 @@
             android:layout_height="wrap_content"
             android:layout_toRightOf="@id/image"
             android:maxLines="2"
-            android:text="@{movieSuggestion.title}"
+            android:text="@{movieSuggestionViewModel.movieSuggestion.title}"
             android:textSize="24sp"
             android:textStyle="bold" />
 
@@ -48,7 +44,7 @@
             android:layout_below="@id/movie_title"
             android:layout_toRightOf="@id/image"
             android:maxLines="1"
-            android:text="@{movieSuggestion.releaseDate}" />
+            android:text="@{movieSuggestionViewModel.movieSuggestion.releaseDate}" />
 
         <TextView
             android:id="@+id/summary_text"
@@ -61,7 +57,7 @@
             android:layout_toRightOf="@id/image"
             android:ellipsize="end"
             android:maxLines="3"
-            android:text="@{movieSuggestion.overview}" />
+            android:text="@{movieSuggestionViewModel.movieSuggestion.overview}" />
 
         <TextView
             android:id="@+id/rating_text"
@@ -71,7 +67,7 @@
             android:layout_toRightOf="@id/image"
             android:gravity="right"
             android:maxLines="1"
-            android:text="@{String.valueOf(movieSuggestion.voteAverage)}" />
+            android:text="@{String.valueOf(movieSuggestionViewModel.movieSuggestion.voteAverage)}" />
 
         <ImageView
             android:id="@+id/whatshot"

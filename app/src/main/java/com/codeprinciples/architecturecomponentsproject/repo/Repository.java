@@ -16,8 +16,11 @@ package com.codeprinciples.architecturecomponentsproject.repo;
 import android.arch.lifecycle.MutableLiveData;
 
 import com.codeprinciples.architecturecomponentsproject.api.ApiManager;
+import com.codeprinciples.architecturecomponentsproject.api.CallbackFailure;
+import com.codeprinciples.architecturecomponentsproject.api.CallbackSuccess;
 import com.codeprinciples.architecturecomponentsproject.database.AppDatabase;
 import com.codeprinciples.architecturecomponentsproject.models.Configuration;
+import com.codeprinciples.architecturecomponentsproject.models.DiscoverMoviesRequest;
 import com.codeprinciples.architecturecomponentsproject.models.Movie;
 import com.codeprinciples.architecturecomponentsproject.models.Resource;
 
@@ -69,7 +72,6 @@ public class Repository {
                 }
             }
         });
-
     }
 
     private void loadMovieFromNetwork(MutableLiveData<Resource<Movie>> movieMutableLiveData, int id) {
@@ -77,5 +79,13 @@ public class Repository {
             AppDatabase.executeAsync(() -> AppDatabase.getInstance().movieDao().setSingle(obj));
             movieMutableLiveData.setValue(new Resource<>(obj));
         }, (code, msg) -> movieMutableLiveData.setValue(new Resource<>(new Resource.Error(code,msg))));
+    }
+
+    public void getMovieSuggestions(CallbackSuccess<DiscoverMoviesRequest> success, CallbackFailure failure){
+        ApiManager.getInstance().getMovieSuggestions(success, failure);
+    }
+
+    public void getMovieSuggestions(String query, CallbackSuccess<DiscoverMoviesRequest> success, CallbackFailure failure){
+        ApiManager.getInstance().getMovieSuggestions(query, success, failure);
     }
 }
