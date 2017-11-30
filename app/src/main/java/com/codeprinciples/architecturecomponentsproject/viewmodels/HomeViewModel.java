@@ -50,18 +50,17 @@ public class HomeViewModel extends ViewModel implements SearchViewBindingAdapter
     private MutableLiveData<MovieSuggestion> selectedMovieSuggestion;
     private MutableLiveData<Resource<Movie>> movieDetails;
 
-    @Override
-    public void onItemClick(SuggestionItemViewModel item) {
-        setSelectedMovieSuggestion(item.getMovieSuggestion());
-    }
-
     public enum ListLayoutType {LIST,GRID}
     private ListLayoutType listLayoutType;
     private LoadingItemViewModel loadingRowItem;
     private SearchInfoItemViewModel searchInfoRowItem;
 
-    public RecyclerView.Adapter getAdapter() {
+    @Override
+    public void onItemClick(SuggestionItemViewModel item) {
+        setSelectedMovieSuggestion(item.getMovieSuggestion());
+    }
 
+    public RecyclerView.Adapter getAdapter() {
         EasyRecyclerAdapter easyRecyclerAdapter = new EasyRecyclerAdapter(getSuggestionsObservableList());
         easyRecyclerAdapter.addMapping(R.layout.layout_discover_movie, BR.movieSuggestionViewModel, SuggestionItemViewModel.class)
                 .addMapping(R.layout.layout_loading_item, BR.loadingItemViewModel, LoadingItemViewModel.class)

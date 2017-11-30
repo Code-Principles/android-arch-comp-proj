@@ -46,7 +46,7 @@ public class HomeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_home);
-        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class); //load view model
         homeViewModel.getSuggestionsObservableList();
         suggestionListFragment = new SuggestionListFragment();
         detailFragment = new DetailFragment();
@@ -54,7 +54,7 @@ public class HomeActivity extends AppCompatActivity {
 
         if(binding.detailFragment==null) {//phone or tablet portrait
             homeViewModel.setListLayoutType(HomeViewModel.ListLayoutType.GRID);
-            homeViewModel.getSelectedMovieSuggestion().observe(this, movieSuggestion ->{
+            homeViewModel.getSelectedMovieSuggestion().observe(this, movieSuggestion ->{ //item selected
                 if(movieSuggestion!=null) {
                     setFragment(R.id.container, detailFragment);
                 }else {
